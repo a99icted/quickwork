@@ -1,7 +1,7 @@
 from pydantic import BaseModel, Field
 
 
-class UserCreate(BaseModel):
+class UserCreate(BaseModel): # Валидация данных при регистрации пользователя
     password: str = Field(min_length=8, max_length=128)
     username: str = Field(min_length=3, max_length=25)
     first_name: str = Field(min_length=1, max_length=25)
@@ -9,12 +9,12 @@ class UserCreate(BaseModel):
     age: int = Field(ge=16, le=100)
 
 
-class CompanyCreate(BaseModel):
+class CompanyCreate(BaseModel): # Валидация данных при регистрации компании, компания создает с пользовательского аккаунта
     name: str = Field(min_length=1, max_length=100)
     description: str = Field(min_length=1, max_length=500)
 
 
-class WorkCreate(BaseModel):
+class WorkCreate(BaseModel): # Валидация данных при создании вакансии
     company_id: int
 
     title: str = Field(min_length=1, max_length=100)
@@ -25,8 +25,7 @@ class WorkCreate(BaseModel):
     salary_to: int | None = Field(default=None, ge=0)
 
 
-class WorkUpdate(BaseModel):
-    # Все поля необязательны: можно обновить только одно из них.
+class WorkUpdate(BaseModel): # Валидация данных при изменении вакансии, можно обновить от 1
     title: str | None = Field(default=None, max_length=100)
     description: str | None = Field(default=None, max_length=500)
 

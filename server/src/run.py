@@ -1,6 +1,6 @@
 import asyncio
 
-from queries.core import init_db, recreate_db
+from repositories.core import init_db, recreate_db
 
 
 async def main():
