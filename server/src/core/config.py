@@ -8,6 +8,10 @@ class Settings(BaseSettings): # функция достает валидируя
     DB_PASS: str
     DB_NAME: str
 
+    JWT_SECRET_KEY: str # Ключ токена
+    JWT_ALGORITHM: str  # Алгоритм шифрования
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30 # Длительность жизни токена
+
     @property
     def DATABASE_URL_asyncpg(self): # Подключение к асинхронной postgres
         return f"postgresql+asyncpg://{self.DB_USER}:{self.DB_PASS}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"

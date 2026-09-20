@@ -1,3 +1,4 @@
+from core.exceptions import AlreadyExistsError, NotFoundError
 from core.security import hash_password
 from db.database import session_factory
 from models.models import User
@@ -5,15 +6,7 @@ from schemas.entities import UserCreate
 from sqlalchemy import select
 
 
-class NotFoundError(Exception):
-    pass
-
-
-class AlreadyExistsError(Exception):
-    pass
-
-
-async def create_user(data: UserCreate) -> int:
+async def create_user(data: UserCreate) -> int: # Создание юзера
     async with session_factory() as session:
         async with session.begin():
             existing_user = await session.scalar(
@@ -23,7 +16,7 @@ async def create_user(data: UserCreate) -> int:
             )
 
             if existing_user is not None:
-                raise ValueError(
+                raise AlreadyExistsError(
                     "Пользователь с таким username уже существует"
                 )
 
@@ -41,7 +34,7 @@ async def create_user(data: UserCreate) -> int:
             return user.id
 
 
-async def delete_user(user_id: int) -> None:
+async def delete_user(user_id: int) -> None: # Удаление юзера по id
     async with session_factory() as session:
         async with session.begin():
             user = await session.get(User, user_id)
@@ -50,3 +43,10 @@ async def delete_user(user_id: int) -> None:
                 raise NotFoundError("Пользователь не найден")
 
             await session.delete(user)
+
+
+async def get_user_by_id(user_id: int) -> User | None: # Получение юзера по id
+    async with session_factory() as session:
+        user = await session.scalar(select(User).where(User.id == user_id))
+
+        return user

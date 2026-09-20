@@ -1,10 +1,10 @@
 import asyncio
 
-from repositories.core import init_db, recreate_db
+from repositories.core import init_db, recreate_db  # noqa: F401
 
 
 async def main():
-    await recreate_db()
+    await init_db()
 
 
 if __name__ == "__main__":

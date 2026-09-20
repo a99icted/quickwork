@@ -1,3 +1,5 @@
+from typing import Literal
+
 from pydantic import BaseModel, Field
 
 
@@ -34,3 +36,27 @@ class WorkUpdate(BaseModel): # Валидация данных при измен
     salary_to: int | None = Field(default=None, ge=0)
 
     company_id: int | None = None
+
+
+class UserRegisterResponse(BaseModel):
+    user_id: int
+    message: str
+
+
+class UserLogin(BaseModel):
+    username: str = Field(min_length=3, max_length=25)
+    password: str = Field(min_length=8, max_length=128)
+
+class TokenResponse(BaseModel):
+    access_token: str
+
+    token_type: Literal["bearer"] = "bearer"
+
+
+class CurrentUserResponse(BaseModel):
+
+    id: int
+    username: str
+    first_name: str
+    last_name: str
+    age: int

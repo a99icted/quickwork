@@ -1,15 +1,8 @@
+from core.exceptions import AlreadyExistsError, NotFoundError
 from db.database import session_factory
 from models.models import Company
 from schemas.entities import CompanyCreate
 from sqlalchemy import select
-
-
-class NotFoundError(Exception): # Ошибка возникает, когда запрашиваемая сущность не найдена в базе данных.
-    pass
-
-
-class AlreadyExistsError(Exception): # Ошибка возникает, когда код пытается создать сущность, которая уже существует в базе данных.
-    pass
 
 
 async def create_company(data: CompanyCreate) -> int:

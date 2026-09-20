@@ -1,3 +1,4 @@
+import models.models  # noqa: F401
 from db.database import Base, async_engine
 
 
