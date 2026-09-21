@@ -49,3 +49,7 @@ async def get_me(
             "username": user.username,
             "first_name": user.first_name,
         }
+
+@router.post("/logout", status_code=status.HTTP_204_NO_CONTENT,)
+async def logout(_: User=Depends(get_current_user)) -> None:
+    return None
