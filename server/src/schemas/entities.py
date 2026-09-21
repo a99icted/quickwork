@@ -15,10 +15,11 @@ class CompanyCreate(BaseModel): # Валидация данных при рег�
     name: str = Field(min_length=1, max_length=100)
     description: str = Field(min_length=1, max_length=500)
 
+class CompanyCreateResponse(BaseModel):
+    company_id: int
+    message: str
 
 class WorkCreate(BaseModel): # Валидация данных при создании вакансии
-    company_id: int
-
     title: str = Field(min_length=1, max_length=100)
     description: str = Field(min_length=1, max_length=500)
 
@@ -37,26 +38,32 @@ class WorkUpdate(BaseModel): # Валидация данных при измен
 
     company_id: int | None = None
 
+class WorkCreateResponse(BaseModel):
 
-class UserRegisterResponse(BaseModel):
+    vacancy_id: int
+    message: str
+
+
+class UserRegisterResponse(BaseModel): # Данные, которые возвращаются после регистрации
+
     user_id: int
     message: str
 
 
-class UserLogin(BaseModel):
+class UserLogin(BaseModel): # Модель валидации данных для входа
     username: str = Field(min_length=3, max_length=25)
     password: str = Field(min_length=8, max_length=128)
 
-class TokenResponse(BaseModel):
+class TokenResponse(BaseModel): # jwt токен
     access_token: str
 
     token_type: Literal["bearer"] = "bearer"
 
 
-class CurrentUserResponse(BaseModel):
+class CurrentUserResponse(BaseModel): # Данные пользователя после аунтификации и получения токена
 
     id: int
     username: str
-    first_name: str
-    last_name: str
-    age: int
+    first_name: str | None
+    last_name: str | None
+    age: int | None

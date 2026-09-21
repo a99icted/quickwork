@@ -5,7 +5,7 @@ from schemas.entities import CompanyCreate
 from sqlalchemy import select
 
 
-async def create_company(data: CompanyCreate) -> int:
+async def create_company(data: CompanyCreate, user_id) -> int:
     async with session_factory() as session:
         async with session.begin():
             existing_company = await session.scalar(select(Company).where(Company.name == data.name))
@@ -13,12 +13,21 @@ async def create_company(data: CompanyCreate) -> int:
             if existing_company is not None:
                 raise AlreadyExistsError("Компания с таким названием уже существует")
 
-            company = Company(**data.model_dump())
+
+            company = Company(**data.model_dump(), user_id=user_id)
 
             session.add(company)
             await session.flush()
 
             return company.id
+
+async def get_company_id_by_user_id(user_id: int,) -> int | None:
+    async with session_factory() as session:
+        return await session.scalar(
+            select(Company.id).where(
+                Company.user_id == user_id,
+            )
+        )
 
 
 async def delete_company(company_id: int) -> None:

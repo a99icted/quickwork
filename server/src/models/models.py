@@ -29,8 +29,8 @@ class User(Base):
     last_name: Mapped[str] = mapped_column(String(25))
     age: Mapped[int] = mapped_column(Integer,nullable=False,)
 
-    works: Mapped[list["Work"]] = relationship(secondary=user_works,back_populates='users')
-
+    works: Mapped[list["Work"]] = relationship(secondary=user_works, back_populates='users')
+    company: Mapped["Company"] = relationship(back_populates='user', cascade="all, delete-orphan")
 
 class Company(Base):
     __tablename__ = 'companies'
@@ -39,9 +39,10 @@ class Company(Base):
     name: Mapped[str] = mapped_column(String(100), unique=True, index=True)
 
     description: Mapped[str] = mapped_column(String(500))
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     # Одна компания много вакансий
     works: Mapped[list["Work"]] = relationship(back_populates='company',cascade="all, delete-orphan")
-
+    user: Mapped["User"] = relationship(back_populates='company',)
 
 class Work(Base):
     __tablename__ = 'works'

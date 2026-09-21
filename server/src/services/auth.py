@@ -13,12 +13,12 @@ class AlreadyExistsError(Exception):
 
 async def authenticate_user(username: str,password: str,) -> User | None: # аунтификация пользователя, хеш пароля из базы данных сравнивается с полученным хеш паролем
     async with session_factory() as session:
-        user = await session.scalar(select(User).where(User.username == username))
+        user = await session.scalar(select(User).where(User.username == username)) # Получаем пользователя по юзернейму
 
         if user is None:
             return None
 
-        is_password_correct = verify_password(plain_password=password,hashed_password=user.hashed_password,)
+        is_password_correct = verify_password(plain_password=password,hashed_password=user.hashed_password,) # Проверяем полученный пароль, сверяя хеши паролей в бд
 
         if not is_password_correct:
             return None

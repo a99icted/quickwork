@@ -12,10 +12,10 @@ class AlreadyExistsError(Exception):
 
 
 
-async def create_work(data: WorkCreate) -> int:
+async def create_work(data: WorkCreate, company_id: int) -> int:
     async with session_factory() as session:
         async with session.begin():
-            company = await session.get(Company, data.company_id,)
+            company = await session.get(Company, company_id,)
 
             if company is None:
                 raise NotFoundError("Компания не найдена")
@@ -28,7 +28,7 @@ async def create_work(data: WorkCreate) -> int:
                 city=work_data["city"],
                 salary_from=work_data["salary_from"],
                 salary_to=work_data["salary_to"],
-                company_id=work_data["company_id"],
+                company_id=company_id,
             )
 
             session.add(work)
