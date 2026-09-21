@@ -1,9 +1,8 @@
 from api.dependencies import get_current_user
-from core.exceptions import AlreadyExistsError
 from core.security import create_access_token
 from fastapi import APIRouter, Depends, HTTPException, status
 from models.models import User
-from repositories.user import create_user
+from repositories.user import AlreadyExistsError, create_user
 from schemas.entities import (
     CurrentUserResponse,
     TokenResponse,

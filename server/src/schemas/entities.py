@@ -29,6 +29,8 @@ class WorkCreate(BaseModel): # Валидация данных при созда
 
 
 class WorkUpdate(BaseModel): # Валидация данных при изменении вакансии, можно обновить от 1
+    vacancy_id: int
+
     title: str | None = Field(default=None, max_length=100)
     description: str | None = Field(default=None, max_length=500)
 
@@ -36,9 +38,11 @@ class WorkUpdate(BaseModel): # Валидация данных при измен
     salary_from: int | None = Field(default=None, ge=0)
     salary_to: int | None = Field(default=None, ge=0)
 
-    company_id: int | None = None
+class WorkUpdateResponse(BaseModel):
+    vacancy_id: int
+    message: str
 
-class WorkCreateResponse(BaseModel):
+class WorkCreateResponse(BaseModel): # Ответ после создания вакансии
 
     vacancy_id: int
     message: str

@@ -1,8 +1,7 @@
 from api.dependencies import get_current_user
-from core.exceptions import AlreadyExistsError
 from fastapi import APIRouter, Depends, HTTPException, status
 from models.models import User
-from repositories.company import create_company
+from repositories.company import AlreadyExistsError, create_company
 from schemas.entities import CompanyCreate, CompanyCreateResponse
 
 router = APIRouter(prefix="/company", tags=["Company"])
