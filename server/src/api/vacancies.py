@@ -4,6 +4,8 @@ from models.models import User
 from repositories.company import get_company_id_by_user_id
 from repositories.work import NotFoundError, create_work, delete_work, update_work
 from schemas.entities import (
+    DeleteWork,
+    DeleteWorkResponse,
     WorkCreate,
     WorkCreateResponse,
     WorkUpdate,
@@ -66,3 +68,19 @@ async def update_vacancy(data: WorkUpdate,current_user: User = Depends(get_curre
         ) from error
 
     return WorkUpdateResponse(vacancy_id=vacancy_id, message="Вакансия обновлена")
+
+
+@router.delete("/delete", response_model=DeleteWorkResponse, status_code=status.HTTP_200_OK)
+async def remove_vacancy(data: DeleteWork, current_user: User = Depends(get_current_user),) -> DeleteWorkResponse:
+    company_id = await get_company_id_by_user_id(user_id=current_user.id,)
+
+    if company_id is None:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail="Сначала зарегистрируйте компанию",)
+
+    try:
+        vacancy_id = await delete_work(vacancy_id=data.vacancy_id, company_id=company_id)
+
+    except NotFoundError as error:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=str(error),) from error
+
+    return DeleteWorkResponse(vacancy_id=vacancy_id, message="Вакансия удалена")

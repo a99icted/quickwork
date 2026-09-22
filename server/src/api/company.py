@@ -1,18 +1,43 @@
 from api.dependencies import get_current_user
 from fastapi import APIRouter, Depends, HTTPException, status
 from models.models import User
-from repositories.company import AlreadyExistsError, create_company
-from schemas.entities import CompanyCreate, CompanyCreateResponse
+from repositories.company import (
+    AlreadyExistsError,
+    NotFoundError,
+    create_company,
+    update_company,
+)
+from schemas.entities import (
+    CompanyCreate,
+    CompanyCreateResponse,
+    CompanyUpdate,
+    CompanyUpdateResponse,
+)
 
 router = APIRouter(prefix="/company", tags=["Company"])
 
-@router.post("/create", response_model=CompanyCreateResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/create", response_model=CompanyCreateResponse, status_code=status.HTTP_201_CREATED) # Создать компанию
 async def company_create(data: CompanyCreate, current_user: User = Depends(get_current_user),) -> CompanyCreateResponse:
     try:
-        user_id = current_user.id
-        company_id = await create_company(data, user_id)
+        company_id = await create_company(data, current_user.id)
 
     except AlreadyExistsError as error:
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Не удалось создать компанию") from error
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(error)) from error
 
     return CompanyCreateResponse(company_id=company_id, message="Компания успешно создана")
+
+
+@router.patch("/update", response_model=CompanyUpdateResponse, status_code=status.HTTP_200_OK) # Обновить данные компании
+async def company_update(data: CompanyUpdate, current_user: User = Depends(get_current_user),) -> CompanyUpdateResponse:
+
+    try:
+        company_id = await update_company(data=data, user_id=current_user.id,)
+
+    except NotFoundError as error:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=str(error),) from error
+    except ValueError as error:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(error)) from error
+    except AlreadyExistsError as error:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT,detail=str(error),) from error
+
+    return CompanyUpdateResponse(company_id=company_id, message="Профиль компании обновлен")

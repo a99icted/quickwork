@@ -72,18 +72,20 @@ async def update_work(vacancy_id: int, company_id: int, data: WorkUpdate,) -> in
             return work.id
 
 
-async def delete_work(work_id: int) -> None:
+async def delete_work(vacancy_id: int, company_id: int) -> int:
     async with session_factory() as session:
         async with session.begin():
-            work = await session.get(Work, work_id)
+            result = await session.execute(select(Work).where(Work.id == vacancy_id, Work.company_id == company_id))
+
+            work = result.scalar_one_or_none()
 
             if work is None:
                 raise NotFoundError("Вакансия не найдена")
 
             await session.delete(work)
+            return vacancy_id
 
-
-async def get_works(page: int = 1, per_page: int = 5) -> list[dict[str, Any]]:
+async def get_works(page: int = 1, per_page: int = 3) -> list[dict[str, Any]]:
     async with session_factory() as session:
         offset = (page - 1) * per_page
 
@@ -91,7 +93,7 @@ async def get_works(page: int = 1, per_page: int = 5) -> list[dict[str, Any]]:
 
         works = result.all()
         list_works =  [
-                {
+                    {
                         "id": work.id,
                         "title": work.title,
                         "description": work.description,

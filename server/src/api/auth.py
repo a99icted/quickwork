@@ -23,7 +23,7 @@ async def register(data: UserCreate) -> UserRegisterResponse: # Возвраща
         user_id = await create_user(data) # Создание пользователя
 
     except AlreadyExistsError as error:
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Не удалось создать пользователя") from error
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(error)) from error
 
     return UserRegisterResponse(user_id=user_id, message="Пользователь успешно зарегистрирован")
 
@@ -41,7 +41,7 @@ async def login(data: UserLogin) -> TokenResponse:
                 access_token=access_token,
             )
 
-@router.get("/me", response_model=CurrentUserResponse)
+@router.get("/me", response_model=CurrentUserResponse) # Получение информации о пользователе
 async def get_me(user: User = Depends(get_current_user),) -> CurrentUserResponse:
 
     return CurrentUserResponse(
