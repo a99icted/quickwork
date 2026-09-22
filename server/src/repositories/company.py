@@ -6,8 +6,7 @@ from sqlalchemy import select
 
 
 async def create_company(data: CompanyCreate, user_id) -> int:
-    async with session_factory() as session:
-        async with session.begin():
+    async with (session_factory() as session, session.begin()):
             company = await session.scalar(select(Company).where(Company.user_id == user_id,))
 
             if company:
@@ -36,8 +35,7 @@ async def get_company_id_by_user_id(user_id: int,) -> int | None:
 
 
 async def delete_company(company_id: int) -> None:
-    async with session_factory() as session:
-        async with session.begin():
+    async with (session_factory() as session, session.begin()):
             company = await session.get(Company, company_id)
 
             if company is None:
@@ -47,8 +45,7 @@ async def delete_company(company_id: int) -> None:
 
 
 async def update_company(data: CompanyUpdate,user_id: int,) -> int:
-    async with session_factory() as session:
-        async with session.begin():
+    async with (session_factory() as session, session.begin()):
             company = await session.scalar(select(Company).where(Company.user_id == user_id,))
 
             if company is None:

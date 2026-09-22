@@ -1,24 +1,14 @@
 from typing import Any
 
-from sqlalchemy import select
-
+from core.exceptions import NotFoundError
 from db.database import session_factory
 from models.models import Company, Work
 from schemas.entities import WorkCreate, WorkUpdate
-
-
-class NotFoundError(Exception):
-    pass
-
-
-class AlreadyExistsError(Exception):
-    pass
-
+from sqlalchemy import select
 
 
 async def create_work(data: WorkCreate, company_id: int) -> int:
-    async with session_factory() as session:
-        async with session.begin():
+    async with (session_factory() as session, session.begin()):
             company = await session.get(Company, company_id,)
 
             if company is None:
@@ -42,8 +32,7 @@ async def create_work(data: WorkCreate, company_id: int) -> int:
 
 
 async def update_work(vacancy_id: int, company_id: int, data: WorkUpdate,) -> int:
-    async with session_factory() as session:
-        async with session.begin():
+    async with (session_factory() as session, session.begin()):
 
             result = await session.execute(select(Work).where(Work.id == vacancy_id, Work.company_id == company_id))
 
@@ -73,8 +62,7 @@ async def update_work(vacancy_id: int, company_id: int, data: WorkUpdate,) -> in
 
 
 async def delete_work(vacancy_id: int, company_id: int) -> int:
-    async with session_factory() as session:
-        async with session.begin():
+    async with (session_factory() as session, session.begin()):
             result = await session.execute(select(Work).where(Work.id == vacancy_id, Work.company_id == company_id))
 
             work = result.scalar_one_or_none()

@@ -7,8 +7,7 @@ from sqlalchemy import select
 
 
 async def create_user(data: UserCreate) -> int: # Создание юзера
-    async with session_factory() as session:
-        async with session.begin():
+    async with (session_factory() as session, session.begin()):
             existing_user = await session.scalar(
                 select(User).where(
                     User.username == data.username
@@ -35,8 +34,7 @@ async def create_user(data: UserCreate) -> int: # Создание юзера
 
 
 async def delete_user(user_id: int) -> None: # Удаление юзера по id
-    async with session_factory() as session:
-        async with session.begin():
+    async with (session_factory() as session, session.begin()):
             user = await session.get(User, user_id)
 
             if user is None:
