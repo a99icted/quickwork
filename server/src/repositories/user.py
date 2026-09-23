@@ -2,7 +2,7 @@ from core.exceptions import AlreadyExistsError, NotFoundError
 from core.security import hash_password
 from db.database import session_factory
 from models.models import User
-from schemas.entities import UserCreate
+from schemas.user import UserCreate
 from sqlalchemy import select
 
 

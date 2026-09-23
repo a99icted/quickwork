@@ -3,7 +3,7 @@ from core.security import create_access_token
 from fastapi import APIRouter, Depends, HTTPException, status
 from models.models import User
 from repositories.user import AlreadyExistsError, create_user
-from schemas.entities import (
+from schemas.user import (
     CurrentUserResponse,
     TokenResponse,
     UserCreate,

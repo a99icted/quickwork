@@ -8,7 +8,7 @@ from repositories.company import (
     delete_company,
     update_company,
 )
-from schemas.entities import (
+from schemas.company import (
     CompanyCreate,
     CompanyCreateResponse,
     CompanyDeleteResponse,

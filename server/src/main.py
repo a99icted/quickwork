@@ -1,10 +1,11 @@
-from fastapi.staticfiles import StaticFiles
 from pathlib import Path
+
 from api.auth import router as auth_router
 from api.company import router as company_router
 from api.vacancies import router as work_router
 from fastapi import FastAPI, HTTPException, status
-from repositories.work import get_works, get_work, NotFoundError  # Временно
+from fastapi.staticfiles import StaticFiles
+from repositories.work import NotFoundError, get_work, get_works  # Временно
 
 BASE_DIR = Path(__file__).resolve().parent
 FRONTEND_DIR = BASE_DIR / "frontend"

@@ -1,7 +1,7 @@
 from core.exceptions import AlreadyExistsError, NotFoundError
 from db.database import session_factory
 from models.models import Company
-from schemas.entities import CompanyCreate, CompanyUpdate
+from schemas.company import CompanyCreate, CompanyUpdate
 from sqlalchemy import select
 
 

@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from models.models import User
 from repositories.company import get_company_id_by_user_id
 from repositories.work import NotFoundError, create_work, delete_work, update_work
-from schemas.entities import (
+from schemas.work import (
     DeleteWork,
     DeleteWorkResponse,
     WorkCreate,
@@ -35,8 +35,8 @@ async def create_vacancy(data: WorkCreate,current_user: User = Depends(get_curre
     return WorkCreateResponse(vacancy_id=vacancy_id,message="Вакансия успешно создана",)
 
 
-@router.patch("/update",response_model=WorkUpdateResponse,status_code=status.HTTP_200_OK,)
-async def update_vacancy(data: WorkUpdate,current_user: User = Depends(get_current_user),) -> WorkUpdateResponse:
+@router.patch("/update/{vacancy_id}",response_model=WorkUpdateResponse,status_code=status.HTTP_200_OK,)
+async def update_vacancy(data: WorkUpdate, vacancy_id: int, current_user: User = Depends(get_current_user),) -> WorkUpdateResponse:
     company_id = await get_company_id_by_user_id(user_id=current_user.id,)
 
     if company_id is None:
@@ -44,7 +44,7 @@ async def update_vacancy(data: WorkUpdate,current_user: User = Depends(get_curre
 
     try:
         vacancy_id = await update_work(
-            vacancy_id=data.vacancy_id,
+            vacancy_id=vacancy_id,
             company_id=company_id,
             data=data,
         )
@@ -70,15 +70,15 @@ async def update_vacancy(data: WorkUpdate,current_user: User = Depends(get_curre
     return WorkUpdateResponse(vacancy_id=vacancy_id, message="Вакансия обновлена")
 
 
-@router.delete("/delete", response_model=DeleteWorkResponse, status_code=status.HTTP_200_OK)
-async def remove_vacancy(data: DeleteWork, current_user: User = Depends(get_current_user),) -> DeleteWorkResponse:
+@router.delete("/delete/{vacancy_id}", response_model=DeleteWorkResponse, status_code=status.HTTP_200_OK)
+async def remove_vacancy(vacancy_id: int, current_user: User = Depends(get_current_user),) -> DeleteWorkResponse:
     company_id = await get_company_id_by_user_id(user_id=current_user.id,)
 
     if company_id is None:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail="Сначала зарегистрируйте компанию",)
 
     try:
-        vacancy_id = await delete_work(vacancy_id=data.vacancy_id, company_id=company_id)
+        vacancy_id = await delete_work(vacancy_id=vacancy_id, company_id=company_id)
 
     except NotFoundError as error:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=str(error),) from error

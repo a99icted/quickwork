@@ -1,9 +1,10 @@
+from pyexpat import features
 from typing import Any
 
 from core.exceptions import NotFoundError
 from db.database import session_factory
 from models.models import Company, Work
-from schemas.entities import WorkCreate, WorkUpdate
+from schemas.work import WorkCreate, WorkUpdate
 from sqlalchemy import select
 
 
@@ -19,9 +20,12 @@ async def create_work(data: WorkCreate, company_id: int) -> int:
             work = Work(
                 title=work_data["title"],
                 description=work_data["description"],
+                time_from=work_data["time_from"],
+                time_to=work_data["time_to"],
                 city=work_data["city"],
-                salary_from=work_data["salary_from"],
-                salary_to=work_data["salary_to"],
+                salary=work_data["salary"],
+                features_id=work_data["features_id"],
+                category_id=work_data["category_id"],
                 company_id=company_id,
             )
 
