@@ -1,5 +1,3 @@
-from sqlalchemy.sql.functions import user
-
 from core.exceptions import AlreadyExistsError, NotFoundError
 from db.database import session_factory
 from models.models import Company

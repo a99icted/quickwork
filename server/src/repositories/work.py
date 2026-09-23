@@ -84,8 +84,7 @@ async def get_works(page: int = 1, per_page: int = 10) -> list[dict[str, Any]]:
                     {
                         "id": work.id,
                         "title": work.title,
-                        "salary_from": work.salary_from,
-                        "salary_to": work.salary_to,
+                        "salary": work.salary,
                     }
                     for work in works
                 ]
@@ -116,7 +115,6 @@ async def get_work(vacancy_id: int) -> dict[str, Any]:
             "id": vacancy.id,
             "title": vacancy.title,
             "description": vacancy.description,
-            "salary_from": vacancy.salary_from,
-            "salary_to": vacancy.salary_to,
+            "salary": vacancy.salary,
             "company": company.name,
         }

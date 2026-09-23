@@ -1,6 +1,7 @@
+from datetime import datetime
 from typing import Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 
 class CompanyCreate(BaseModel): # Валидация данных при регистрации компании, компания создает с пользовательского аккаунта
@@ -24,23 +25,42 @@ class CompanyDeleteResponse(BaseModel):
     message: str
 
 
-class WorkCreate(BaseModel): # Валидация данных при создании вакансии
+class WorkCreate(BaseModel):
     title: str = Field(min_length=1, max_length=100)
     description: str = Field(min_length=1, max_length=500)
 
-    city: str | None = Field(default=None, max_length=100)
-    salary_from: int | None = Field(default=None, ge=0)
-    salary_to: int | None = Field(default=None, ge=0)
-
-class WorkUpdate(BaseModel): # Валидация данных при изменении вакансии, можно обновить от 1
-    vacancy_id: int
-
-    title: str | None = Field(default=None, max_length=100)
-    description: str | None = Field(default=None, max_length=500)
+    time_from: datetime
+    time_to: datetime
 
     city: str | None = Field(default=None, max_length=100)
-    salary_from: int | None = Field(default=None, ge=0)
-    salary_to: int | None = Field(default=None, ge=0)
+    salary: int | None = Field(default=None, ge=0)
+
+    features_id: int = Field(ge=1)
+    category_id: int = Field(ge=1)
+
+    # смена не может заканчиваться раньше, чем началась
+    @model_validator(mode='after')
+    def check_time_logic(self) -> 'WorkCreate':
+        if self.time_from >= self.time_to:
+            raise ValueError('Время окончания смены должно быть позже времени начала')
+        return self
+
+
+class WorkUpdate(BaseModel):
+    # vacancy_id: int
+
+    title: str | None = Field(default=None, min_length=1, max_length=100)
+    description: str | None = Field(default=None, min_length=1, max_length=500)
+
+    time_from: datetime | None = None
+    time_to: datetime | None = None
+
+    city: str | None = Field(default=None, max_length=100)
+    salary: int | None = Field(default=None, ge=0)
+
+    features_id: int | None = Field(default=None, ge=1)
+    category_id: int | None = Field(default=None, ge=1)
+
 
 class DeleteWork(BaseModel): # Удаление вакансии
     vacancy_id: int
