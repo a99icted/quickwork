@@ -9,6 +9,7 @@ class UserCreate(BaseModel): # Валидация данных при регис
     first_name: str = Field(min_length=1, max_length=25)
     last_name: str = Field(min_length=1, max_length=25)
     age: int = Field(ge=16, le=100)
+    role: Literal["worker", "employer"] = Field(default="worker")
 
 class UserLogin(BaseModel): # Модель валидации данных для входа
     username: str = Field(min_length=3, max_length=25)
