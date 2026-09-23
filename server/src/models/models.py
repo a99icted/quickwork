@@ -1,7 +1,7 @@
 from datetime import datetime
-
+import enum
 from db.database import Base
-from sqlalchemy import DateTime, ForeignKey, Integer, String
+from sqlalchemy import DateTime, ForeignKey, Integer, String, Enum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 
@@ -10,28 +10,19 @@ class UserWork(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
 
-    user_id: Mapped[int] = mapped_column(
-        ForeignKey("users.id", ondelete="CASCADE"),
-        nullable=False,
-        index=True
-    )
-
-    work_id: Mapped[int] = mapped_column(
-        ForeignKey("works.id", ondelete="CASCADE"),
-        nullable=False,
-        index=True
-    )
-
-    status_id: Mapped[int] = mapped_column(
-        ForeignKey("statuses.id", ondelete="RESTRICT"),
-        nullable=False,
-        index=True
-    )
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"),nullable=False,index=True)
+    work_id: Mapped[int] = mapped_column(ForeignKey("works.id", ondelete="CASCADE"),nullable=False,index=True)
+    status_id: Mapped[int] = mapped_column(ForeignKey("statuses.id", ondelete="RESTRICT"),nullable=False,index=True)
 
     user: Mapped["User"] = relationship(back_populates="applications")
     work: Mapped["Work"] = relationship(back_populates="applications")
     status: Mapped["Status"] = relationship(back_populates="applications")
 
+
+class Role(str, enum.Enum):
+    WORKER = 'worker'
+    EMPLOYER = 'employer'
+    ADMIN = 'admin'
 
 
 class User(Base): # Пользователь
@@ -44,7 +35,7 @@ class User(Base): # Пользователь
     first_name: Mapped[str] = mapped_column(String(25))
     last_name: Mapped[str] = mapped_column(String(25))
     age: Mapped[int] = mapped_column(Integer,nullable=False,)
-
+    role: Mapped[Role] = mapped_column(Enum(Role), default=Role.WORKER, nullable=False)
     applications: Mapped[list["UserWork"]] = relationship(back_populates='user')
     company: Mapped["Company"] = relationship(back_populates='user', cascade="all, delete-orphan", uselist=False)
 
@@ -71,7 +62,6 @@ class Work(Base): # Вакансия
     time_to: Mapped[datetime] = mapped_column(DateTime(timezone=True))
 
     city: Mapped[str | None] = mapped_column(String(100), nullable=True, index=True)
-
     salary: Mapped[int | None] = mapped_column(nullable=True)
 
 
@@ -82,7 +72,6 @@ class Work(Base): # Вакансия
     category: Mapped["Category"] = relationship(back_populates='works')
 
     company_id: Mapped[int] = mapped_column(ForeignKey("companies.id", ondelete="CASCADE"), nullable=False, )
-
     company: Mapped["Company"] = relationship(back_populates="works",)
 
     applications: Mapped[list["UserWork"]] = relationship(back_populates='work')
@@ -92,7 +81,6 @@ class Category(Base): # Категории услуг
     __tablename__ = 'categories'
 
     id: Mapped[int] = mapped_column(primary_key=True)
-
     name: Mapped[str] = mapped_column(String(250))
     slug: Mapped[str] = mapped_column(String(250), index=True, unique=True)
 
@@ -103,7 +91,6 @@ class Feature(Base): # Особенности - необходимость до�
     __tablename__ = 'features'
 
     id: Mapped[int] = mapped_column(primary_key=True)
-
     name: Mapped[str] = mapped_column(String(250))
 
     works: Mapped[list["Work"]] = relationship(back_populates='features')

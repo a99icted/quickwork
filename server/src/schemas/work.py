@@ -25,8 +25,6 @@ class WorkCreate(BaseModel):
 
 
 class WorkUpdate(BaseModel):
-    # vacancy_id: int
-
     title: str | None = Field(default=None, min_length=1, max_length=100)
     description: str | None = Field(default=None, min_length=1, max_length=500)
 
@@ -40,7 +38,7 @@ class WorkUpdate(BaseModel):
     category_id: int | None = Field(default=None, ge=1)
 
 
-class DeleteWork(BaseModel): # Удаление вакансии
+class DeleteWork(BaseModel): # Удаление вакансии - уже не нужно
     vacancy_id: int
 
 class DeleteWorkResponse(BaseModel): # Ответ после успешного удаления

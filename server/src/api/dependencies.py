@@ -3,7 +3,7 @@ from typing import Annotated
 from core.security import get_user_id_from_access_token
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from models.models import User
+from models.models import User, Role
 from repositories.user import get_user_by_id
 
 bearer_scheme = HTTPBearer(auto_error=False)
@@ -30,3 +30,10 @@ async def get_current_user(credentials: AuthCredentials,) -> User:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Недействительный или просроченный токен", headers=auth_headers,)
 
     return user
+
+
+async def get_current_admin(current_user: User = Depends(get_current_user)) -> User:
+    if current_user.role != Role.ADMIN:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Не достаточно прав")
+
+    return current_user

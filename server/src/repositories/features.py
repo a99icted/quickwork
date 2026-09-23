@@ -1,4 +1,4 @@
-from core.exceptions import AlreadyExistsError, NotFoundError
+from core.exceptions import AlreadyExistsError
 from db.database import session_factory
 from models.models import Feature
 from schemas.features import FeatureAdd

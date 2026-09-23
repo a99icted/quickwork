@@ -1,4 +1,3 @@
-from pyexpat import features
 from typing import Any
 
 from core.exceptions import NotFoundError

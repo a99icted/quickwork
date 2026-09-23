@@ -4,7 +4,6 @@ from models.models import User
 from repositories.company import get_company_id_by_user_id
 from repositories.work import NotFoundError, create_work, delete_work, update_work
 from schemas.work import (
-    DeleteWork,
     DeleteWorkResponse,
     WorkCreate,
     WorkCreateResponse,
