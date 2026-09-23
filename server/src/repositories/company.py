@@ -1,3 +1,5 @@
+from sqlalchemy.sql.functions import user
+
 from core.exceptions import AlreadyExistsError, NotFoundError
 from db.database import session_factory
 from models.models import Company
@@ -34,14 +36,15 @@ async def get_company_id_by_user_id(user_id: int,) -> int | None:
         )
 
 
-async def delete_company(company_id: int) -> None:
+async def delete_company(user_id: int) -> int:
     async with (session_factory() as session, session.begin()):
-            company = await session.get(Company, company_id)
+            company = await session.scalar(select(Company).where(Company.user_id == user_id,))
 
             if company is None:
                 raise NotFoundError("Компания не найдена")
 
             await session.delete(company)
+            return company.id
 
 
 async def update_company(data: CompanyUpdate,user_id: int,) -> int:

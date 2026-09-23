@@ -73,7 +73,7 @@ async def delete_work(vacancy_id: int, company_id: int) -> int:
             await session.delete(work)
             return vacancy_id
 
-async def get_works(page: int = 1, per_page: int = 3) -> list[dict[str, Any]]:
+async def get_works(page: int = 1, per_page: int = 10) -> list[dict[str, Any]]:
     async with session_factory() as session:
         offset = (page - 1) * per_page
 
@@ -84,11 +84,39 @@ async def get_works(page: int = 1, per_page: int = 3) -> list[dict[str, Any]]:
                     {
                         "id": work.id,
                         "title": work.title,
-                        "description": work.description,
-                        "city": work.city,
                         "salary_from": work.salary_from,
                         "salary_to": work.salary_to,
                     }
                     for work in works
                 ]
         return list_works
+
+
+async def get_work(vacancy_id: int) -> dict[str, Any]:
+    async with session_factory() as session:
+        vacancy = await session.scalar(
+            select(Work).where(
+                Work.id == vacancy_id,
+            )
+        )
+
+        if vacancy is None:
+            raise NotFoundError("Вакансия не найдена")
+
+        company = await session.scalar(
+            select(Company).where(
+                Company.id == vacancy.company_id,
+            )
+        )
+
+        if company is None:
+            raise NotFoundError("Компания вакансии не найдена")
+
+        return {
+            "id": vacancy.id,
+            "title": vacancy.title,
+            "description": vacancy.description,
+            "salary_from": vacancy.salary_from,
+            "salary_to": vacancy.salary_to,
+            "company": company.name,
+        }

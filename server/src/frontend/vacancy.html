@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+    <title>AgroWork — вакансия</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="header">
+        <a class="logo" href="index.html">
+            AgroWork
+        </a>
+
+        <nav class="nav">
+            <a href="index.html">Вакансии</a>
+            <a href="#">Компании</a>
+            <a class="login-button" href="#">Войти</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        <a class="back-link" href="index.html">
+            ← Ко всем вакансиям
+        </a>
+
+        <article id="vacancy" class="vacancy-page">
+            <p>Загрузка вакансии...</p>
+        </article>
+    </main>
+
+    <script>
+        async function loadVacancy() {
+            const vacancyElement = document.getElementById("vacancy");
+            const params = new URLSearchParams(window.location.search);
+            const vacancyId = params.get("id");
+
+            if (!vacancyId) {
+                vacancyElement.innerHTML = `
+                    <p class="error">ID вакансии не указан.</p>
+                `;
+                return;
+            }
+
+            try {
+                const response = await fetch(`/vacancies/${vacancyId}`);
+
+                if (response.status === 404) {
+                    vacancyElement.innerHTML = `
+                        <p class="error">Вакансия не найдена.</p>
+                    `;
+                    return;
+                }
+
+                if (!response.ok) {
+                    throw new Error("Не удалось получить вакансию");
+                }
+
+                const vacancy = await response.json();
+
+                const salary = getSalary(
+                    vacancy.salary_from,
+                    vacancy.salary_to,
+                );
+
+                vacancyElement.innerHTML = `
+                    <p class="company-name">${vacancy.company}</p>
+
+                    <h1>${vacancy.title}</h1>
+
+                    <p class="salary">${salary}</p>
+
+                    <hr>
+
+                    <h2>Описание вакансии</h2>
+
+                    <p class="description">
+                        ${vacancy.description}
+                    </p>
+
+                    <button class="respond-button">
+                        Откликнуться
+                    </button>
+                `;
+            } catch (error) {
+                vacancyElement.innerHTML = `
+                    <p class="error">
+                        Не удалось загрузить вакансию.
+                    </p>
+                `;
+
+                console.error(error);
+            }
+        }
+
+        function getSalary(salaryFrom, salaryTo) {
+            if (salaryFrom && salaryTo) {
+                return `${salaryFrom}–${salaryTo} ₽`;
+            }
+
+            if (salaryFrom) {
+                return `от ${salaryFrom} ₽`;
+            }
+
+            if (salaryTo) {
+                return `до ${salaryTo} ₽`;
+            }
+
+            return "Зарплата не указана";
+        }
+
+        loadVacancy();
+    </script>
+</body>
+</html>

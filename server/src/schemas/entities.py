@@ -19,6 +19,10 @@ class CompanyCreateResponse(BaseModel):
     company_id: int
     message: str
 
+class CompanyDeleteResponse(BaseModel):
+    company_id: int
+    message: str
+
 
 class WorkCreate(BaseModel): # Валидация данных при создании вакансии
     title: str = Field(min_length=1, max_length=100)
