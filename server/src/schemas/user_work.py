@@ -37,3 +37,20 @@ class WorkResponse(BaseModel):
 
     features_id: int
     category_id: int
+
+class WorkInfo(BaseModel):
+    id: int
+    title: str
+    city: str
+    salary: int
+    time_from: datetime
+    time_to: datetime
+
+class UserShortInfo(BaseModel):
+    id: int
+    first_name: str
+    last_name: str
+
+class ResponseItem(BaseModel):
+    work: WorkInfo
+    user: UserShortInfo
