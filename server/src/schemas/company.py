@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class CompanyCreate(BaseModel): # Валидация данных при регистрации компании, компания создает с пользовательского аккаунта
@@ -20,3 +20,10 @@ class CompanyCreateResponse(BaseModel):
 class CompanyDeleteResponse(BaseModel):
     company_id: int
     message: str
+
+class CompanyResponse(BaseModel):
+    id: int
+    name: str
+    description: str
+
+    model_config = ConfigDict(from_attributes=True)

@@ -1,8 +1,20 @@
-from datetime import datetime
 import enum
+from datetime import datetime
+
 from db.database import Base
-from sqlalchemy import DateTime, ForeignKey, Integer, String, Enum
+from sqlalchemy import DateTime, Enum, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+
+class Role(str, enum.Enum):
+    WORKER = 'worker'
+    EMPLOYER = 'employer'
+    ADMIN = 'admin'
+
+class Status(str, enum.Enum):
+    PENDING = 'pending'
+    APPROVED = 'approved'
+    REJECTED = 'rejected'
 
 
 class UserWork(Base):
@@ -12,17 +24,10 @@ class UserWork(Base):
 
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"),nullable=False,index=True)
     work_id: Mapped[int] = mapped_column(ForeignKey("works.id", ondelete="CASCADE"),nullable=False,index=True)
-    status_id: Mapped[int] = mapped_column(ForeignKey("statuses.id", ondelete="RESTRICT"),nullable=False,index=True)
+    status: Mapped[Status] = mapped_column(Enum(Status), default=Status.PENDING)
 
     user: Mapped["User"] = relationship(back_populates="applications")
     work: Mapped["Work"] = relationship(back_populates="applications")
-    status: Mapped["Status"] = relationship(back_populates="applications")
-
-
-class Role(str, enum.Enum):
-    WORKER = 'worker'
-    EMPLOYER = 'employer'
-    ADMIN = 'admin'
 
 
 class User(Base): # Пользователь
@@ -38,6 +43,7 @@ class User(Base): # Пользователь
     role: Mapped[Role] = mapped_column(Enum(Role), default=Role.WORKER, nullable=False)
     applications: Mapped[list["UserWork"]] = relationship(back_populates='user')
     company: Mapped["Company"] = relationship(back_populates='user', cascade="all, delete-orphan", uselist=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
 
 class Company(Base): # Компания
     __tablename__ = 'companies'
@@ -50,6 +56,7 @@ class Company(Base): # Компания
     # Одна компания много вакансий
     works: Mapped[list["Work"]] = relationship(back_populates='company',cascade="all, delete-orphan")
     user: Mapped["User"] = relationship(back_populates='company', single_parent=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
 
 class Work(Base): # Вакансия
     __tablename__ = 'works'
@@ -76,6 +83,7 @@ class Work(Base): # Вакансия
 
     applications: Mapped[list["UserWork"]] = relationship(back_populates='work')
 
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
 
 class Category(Base): # Категории услуг
     __tablename__ = 'categories'
@@ -94,14 +102,3 @@ class Feature(Base): # Особенности - необходимость до�
     name: Mapped[str] = mapped_column(String(250))
 
     works: Mapped[list["Work"]] = relationship(back_populates='features')
-
-
-
-class Status(Base): # Статус, который присваивается вакансии, когда юзер откликается на неё (Не просмотрено, Работадатель вас ожидает)
-    __tablename__ = 'statuses'
-
-    id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] = mapped_column(String(250))
-    color: Mapped[str] = mapped_column(String(7), default="#f3f5fa")
-
-    applications: Mapped[list["UserWork"]] = relationship(back_populates="status")

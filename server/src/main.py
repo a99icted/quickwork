@@ -3,6 +3,7 @@ from pathlib import Path
 from api.auth import router as auth_router
 from api.company import router as company_router
 from api.vacancies import router as work_router
+from api.user_to_work import router as user_work_router
 from fastapi import FastAPI, HTTPException, status
 from fastapi.staticfiles import StaticFiles
 from repositories.work import NotFoundError, get_work, get_works  # Временно
@@ -15,7 +16,7 @@ app = FastAPI(title="Quick Jobs API")
 app.include_router(auth_router)
 app.include_router(company_router)
 app.include_router(work_router)
-
+app.include_router(user_work_router)
 
 @app.get("/vacancies") # Временно
 async def get_vacancies(page: int = 1):

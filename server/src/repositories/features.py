@@ -10,7 +10,7 @@ async def create_feature(data: FeatureAdd):
         category = await session.scalar(select(Feature).where(Feature.name == data.name))
 
         if category:
-            raise AlreadyExistsError("Такая категория уже есть")
+            raise AlreadyExistsError("Такая особенность уже есть")
 
         category = Feature(**data.model_dump())
 

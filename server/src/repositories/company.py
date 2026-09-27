@@ -75,3 +75,24 @@ async def update_company(data: CompanyUpdate,user_id: int,) -> int:
             await session.flush()
 
             return company.id
+
+
+async def get_all_companies() -> list:
+    async with session_factory() as session:
+        companies = await session.scalars(select(Company))
+        if companies is None:
+            raise NotFoundError("Компании не найдены")
+
+        companies = companies.all()
+
+        return [{"id": company.id, "name": company.name, "description": company.description} for company in companies]
+
+
+async def get_company_by_id(company_id: int) -> Company:
+    async with session_factory() as session:
+        company = await session.scalar(select(Company).where(Company.id == company_id))
+
+        if company is None:
+            raise NotFoundError("Компании не существует")
+
+        return company

@@ -56,3 +56,8 @@ async def get_me(user: User = Depends(get_current_user),) -> CurrentUserResponse
 async def logout(_: User=Depends(get_current_user)) -> None: # Пока не имеет смысла, логаут обычно происходит через фронтенд
     # Можно сделать серверное хранилище не истекших, но logout логинов
     return None
+
+
+
+# получение профиля пользователя по id без аунтификации
+# получить список всех вакансий, на которые откликнулся пользователь

@@ -3,7 +3,7 @@ from typing import Annotated
 from core.security import get_user_id_from_access_token
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from models.models import User, Role
+from models.models import Role, User
 from repositories.user import get_user_by_id
 
 bearer_scheme = HTTPBearer(auto_error=False)

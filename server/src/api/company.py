@@ -1,17 +1,20 @@
 from api.dependencies import get_current_user
 from fastapi import APIRouter, Depends, HTTPException, status
-from models.models import User
+from models.models import Company, User
 from repositories.company import (
     AlreadyExistsError,
     NotFoundError,
     create_company,
     delete_company,
+    get_all_companies,
+    get_company_by_id,
     update_company,
 )
 from schemas.company import (
     CompanyCreate,
     CompanyCreateResponse,
     CompanyDeleteResponse,
+    CompanyResponse,
     CompanyUpdate,
     CompanyUpdateResponse,
 )
@@ -54,3 +57,26 @@ async def comapany_delete(current_user: User = Depends(get_current_user),) -> Co
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(error),) from error
 
     return CompanyDeleteResponse(company_id=company_id, message="Компания успешно удалена")
+
+@router.get('/companies', response_model=list[CompanyResponse], status_code=status.HTTP_200_OK)
+async def get_companies() -> list[CompanyResponse]:
+    try:
+        companies = await get_all_companies()
+    except NotFoundError as error:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(error)) from error
+    return companies
+
+
+@router.get('/company/{company_id}', response_model=CompanyResponse, status_code=status.HTTP_200_OK)
+async def get_company(company_id: int) -> Company:
+    try:
+        company = await get_company_by_id(company_id=company_id)
+    except NotFoundError as error:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(error)) from error
+
+    return company
+
+# получение всех вакансий компании
+# получение всех откликов по всем вакансиям
+# получение всех откликов по определенной вакансии
+# получение списка всех вакансий
