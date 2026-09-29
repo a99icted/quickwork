@@ -5,6 +5,7 @@ from repositories.features import create_feature
 from schemas.category import CategoryAdd
 from schemas.features import FeatureAdd
 
+
 async def init_db(): # Создаем базу данных
     async with async_engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)

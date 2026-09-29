@@ -5,7 +5,7 @@ from schemas.company import CompanyCreate, CompanyUpdate
 from sqlalchemy import select
 
 
-async def create_company(data: CompanyCreate, user_id) -> int:
+async def create_company(data: CompanyCreate, user_id) -> int: # Создание компании
     async with (session_factory() as session, session.begin()):
             company = await session.scalar(select(Company).where(Company.user_id == user_id,))
 
@@ -25,7 +25,7 @@ async def create_company(data: CompanyCreate, user_id) -> int:
 
             return company.id
 
-async def get_company_id_by_user_id(user_id: int,) -> int | None:
+async def get_company_id_by_user_id(user_id: int,) -> int | None: # Получить компанию по user_id
     async with session_factory() as session:
         return await session.scalar(
             select(Company.id).where(
@@ -34,7 +34,7 @@ async def get_company_id_by_user_id(user_id: int,) -> int | None:
         )
 
 
-async def delete_company(user_id: int) -> int:
+async def delete_company(user_id: int) -> int: # Удалить компанию
     async with (session_factory() as session, session.begin()):
             company = await session.scalar(select(Company).where(Company.user_id == user_id,))
 
@@ -45,7 +45,7 @@ async def delete_company(user_id: int) -> int:
             return company.id
 
 
-async def update_company(data: CompanyUpdate,user_id: int,) -> int:
+async def update_company(data: CompanyUpdate,user_id: int,) -> int: # Обновить компанию
     async with (session_factory() as session, session.begin()):
             company = await session.scalar(select(Company).where(Company.user_id == user_id,))
 
@@ -77,7 +77,7 @@ async def update_company(data: CompanyUpdate,user_id: int,) -> int:
             return company.id
 
 
-async def get_all_companies() -> list:
+async def get_all_companies() -> list: # Получить все компании
     async with session_factory() as session:
         companies = await session.scalars(select(Company))
         if companies is None:
@@ -88,7 +88,7 @@ async def get_all_companies() -> list:
         return [{"id": company.id, "name": company.name, "description": company.description} for company in companies]
 
 
-async def get_company_by_id(company_id: int) -> Company:
+async def get_company_by_id(company_id: int) -> Company: # Получить компанию по id
     async with session_factory() as session:
         company = await session.scalar(select(Company).where(Company.id == company_id))
 

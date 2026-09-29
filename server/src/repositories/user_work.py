@@ -4,7 +4,7 @@ from models.models import Company, User, UserWork, Work
 from sqlalchemy import select
 
 
-async def create_user_work(user_id: int, work_id: int) -> UserWork:
+async def create_user_work(user_id: int, work_id: int) -> UserWork: # Юзер добавляет себе отклик по вакансии
     async with session_factory() as session:
         work = await session.scalar(select(Work).where(Work.id == work_id))
         if work is None:
@@ -28,7 +28,7 @@ async def update_status(user_id: int, work_id: int, status: str):
             raise NotFoundError("Пользователь не найден")
 
 
-async def get_user_works(user_id: int):
+async def get_user_works(user_id: int): # Юзер получает свои отклики
     async with session_factory() as session:
         query = (
             select(Work)

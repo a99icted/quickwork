@@ -5,17 +5,17 @@ from repositories.user_work import (
     AlreadyExistsError,
     NotFoundError,
     create_user_work,
+    get_responses_company,
     get_user_works,
-    get_responses_company
 )
-from schemas.user_work import UserWorkResponse, WorkResponse, ResponseItem
+from schemas.user_work import ResponseItem, UserWorkResponse, WorkResponse
 
 # обновление статуса вакансии компанией
 
 router = APIRouter(prefix="/uwe", tags=["User_To_Work",])
 
 
-@router.post("/add_work", response_model=UserWorkResponse)
+@router.post("/add_work", response_model=UserWorkResponse) # Откликнуться на вакансию
 async def add_work_to_user(work_id: int, current_user: User = Depends(get_current_user),) -> UserWorkResponse:
 
     try:
@@ -27,7 +27,7 @@ async def add_work_to_user(work_id: int, current_user: User = Depends(get_curren
     return UserWorkResponse(user_id=response.user_id, work_id=response.work_id, status=response.status)
 
 
-@router.get("/getworks", response_model=list[WorkResponse])
+@router.get("/getworks", response_model=list[WorkResponse]) # Получить отклики
 async def get_works(current_user: User = Depends(get_current_user)):
 
     works = await get_user_works(user_id=current_user.id)
@@ -35,7 +35,7 @@ async def get_works(current_user: User = Depends(get_current_user)):
     return works
 
 
-@router.get("/get_response", response_model=list[ResponseItem], status_code=status.HTTP_200_OK)
+@router.get("/get_response", response_model=list[ResponseItem], status_code=status.HTTP_200_OK) # Получить отклики
 async def get_responses(current_user: User = Depends(get_current_user)) -> list[ResponseItem]:
     try:
         reponses = await get_responses_company(user_id=current_user.id)

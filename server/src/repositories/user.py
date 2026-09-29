@@ -6,7 +6,7 @@ from schemas.user import UserCreate
 from sqlalchemy import select
 
 
-async def create_user(data: UserCreate) -> int: # Создание юзера
+async def create_user(data: UserCreate) -> int: # Регистрация пользователя
     async with (session_factory() as session, session.begin()):
             existing_user = await session.scalar(
                 select(User).where(

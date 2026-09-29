@@ -5,7 +5,7 @@ from schemas.category import CategoryAdd
 from sqlalchemy import select
 
 
-async def create_category(data: CategoryAdd):
+async def create_category(data: CategoryAdd): # Добавить категорию
     async with session_factory() as session:
         category = await session.scalar(select(Category).where(Category.slug == data.slug))
 

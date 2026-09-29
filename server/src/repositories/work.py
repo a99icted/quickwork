@@ -7,7 +7,7 @@ from schemas.work import WorkCreate, WorkUpdate
 from sqlalchemy import select
 
 
-async def create_work(data: WorkCreate, company_id: int) -> int:
+async def create_work(data: WorkCreate, company_id: int) -> int: # Создания вакансии
     async with (session_factory() as session, session.begin()):
             company = await session.get(Company, company_id,)
 
@@ -34,7 +34,7 @@ async def create_work(data: WorkCreate, company_id: int) -> int:
             return work.id
 
 
-async def update_work(vacancy_id: int, company_id: int, data: WorkUpdate,) -> int:
+async def update_work(vacancy_id: int, company_id: int, data: WorkUpdate,) -> int: # Обновить вакансию
     async with (session_factory() as session, session.begin()):
 
             result = await session.execute(select(Work).where(Work.id == vacancy_id, Work.company_id == company_id))
@@ -64,7 +64,7 @@ async def update_work(vacancy_id: int, company_id: int, data: WorkUpdate,) -> in
             return work.id
 
 
-async def delete_work(vacancy_id: int, company_id: int) -> int:
+async def delete_work(vacancy_id: int, company_id: int) -> int: # Удалить вакансию
     async with (session_factory() as session, session.begin()):
             result = await session.execute(select(Work).where(Work.id == vacancy_id, Work.company_id == company_id))
 
@@ -76,7 +76,7 @@ async def delete_work(vacancy_id: int, company_id: int) -> int:
             await session.delete(work)
             return vacancy_id
 
-async def get_works(page: int = 1, per_page: int = 10) -> list[dict[str, Any]]:
+async def get_works(page: int = 1, per_page: int = 10) -> list[dict[str, Any]]: # Получить вакансии
     async with session_factory() as session:
         offset = (page - 1) * per_page
 
@@ -94,7 +94,7 @@ async def get_works(page: int = 1, per_page: int = 10) -> list[dict[str, Any]]:
         return list_works
 
 
-async def get_work(vacancy_id: int) -> dict[str, Any]:
+async def get_work(vacancy_id: int) -> dict[str, Any]: # Получить вакансию
     async with session_factory() as session:
         vacancy = await session.scalar(
             select(Work).where(
