@@ -1,5 +1,7 @@
+from datetime import date
+
 from api.dependencies import get_current_user
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from models.models import User
 from repositories.company import get_company_id_by_user_id
 from repositories.work import (
@@ -14,6 +16,8 @@ from schemas.work import (
     DeleteWorkResponse,
     WorkCreate,
     WorkCreateResponse,
+    WorkFilters,
+    WorkFiltersResponse,
     WorkUpdate,
     WorkUpdateResponse,
 )
@@ -91,9 +95,14 @@ async def remove_vacancy(vacancy_id: int, current_user: User = Depends(get_curre
 
     return DeleteWorkResponse(vacancy_id=vacancy_id, message="Вакансия удалена")
 
-@router.get("/") # Временно
-async def get_vacancies(page: int = 1):
-    return await get_works(page=page)
+@router.get("/", response_model=list[WorkFiltersResponse],)
+async def get_vacancies(filters: WorkFilters = Depends(),):
+    return await get_works(
+        city=filters.city,
+        work_date=filters.work_date,
+        page=filters.page,
+        per_page=filters.per_page,
+    )
 
 
 @router.get("/{vacancy_id}")

@@ -1,10 +1,11 @@
+from datetime import date
 from typing import Any
 
 from core.exceptions import NotFoundError
 from db.database import session_factory
 from models.models import Company, Work
 from schemas.work import WorkCreate, WorkUpdate
-from sqlalchemy import select
+from sqlalchemy import func, select
 
 
 async def create_work(data: WorkCreate, company_id: int) -> int: # Создания вакансии
@@ -19,8 +20,10 @@ async def create_work(data: WorkCreate, company_id: int) -> int: # Создан�
             work = Work(
                 title=work_data["title"],
                 description=work_data["description"],
+                work_date=work_data["work_date"],
                 time_from=work_data["time_from"],
                 time_to=work_data["time_to"],
+                ends_next_day=work_data["ends_next_day"],
                 city=work_data["city"],
                 salary=work_data["salary"],
                 features_id=work_data["features_id"],
@@ -76,22 +79,42 @@ async def delete_work(vacancy_id: int, company_id: int) -> int: # Удалить
             await session.delete(work)
             return vacancy_id
 
-async def get_works(page: int = 1, per_page: int = 10) -> list[dict[str, Any]]: # Получить вакансии
+async def get_works(page: int = 1,per_page: int = 10,city: str | None = None,work_date: date | None = None,) -> list[dict[str, Any]]:
     async with session_factory() as session:
         offset = (page - 1) * per_page
 
-        result = await session.scalars(select(Work).order_by(Work.id.asc()).offset(offset).limit(per_page))
+        stmt = select(Work)
 
+        if city:
+            stmt = stmt.where(
+                func.lower(Work.city) == city.strip().lower()
+            )
+
+        if work_date:
+            stmt = stmt.where(Work.work_date == work_date)
+
+        stmt = (
+            stmt
+            .order_by(Work.work_date.asc(), Work.time_from.asc())
+            .offset(offset)
+            .limit(per_page)
+        )
+
+        result = await session.scalars(stmt)
         works = result.all()
-        list_works =  [
-                    {
-                        "id": work.id,
-                        "title": work.title,
-                        "salary": work.salary,
-                    }
-                    for work in works
-                ]
-        return list_works
+
+        return [
+            {
+                "id": work.id,
+                "title": work.title,
+                "salary": work.salary,
+                "work_date": work.work_date,
+                "time_from": work.time_from,
+                "time_to": work.time_to,
+                "city": work.city,
+            }
+            for work in works
+        ]
 
 
 async def get_work(vacancy_id: int) -> dict[str, Any]: # Получить вакансию
@@ -120,4 +143,7 @@ async def get_work(vacancy_id: int) -> dict[str, Any]: # Получить вак
             "description": vacancy.description,
             "salary": vacancy.salary,
             "company": company.name,
+            "work_date": vacancy.work_date,
+            "time_from": vacancy.time_from,
+            "time_to": vacancy.time_to,
         }

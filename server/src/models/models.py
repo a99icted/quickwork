@@ -1,8 +1,8 @@
 import enum
-from datetime import datetime
+from datetime import date, datetime, time
 
 from db.database import Base
-from sqlalchemy import DateTime, Enum, ForeignKey, Integer, String
+from sqlalchemy import Boolean, Date, DateTime, Enum, ForeignKey, Integer, String, Time
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 
@@ -65,8 +65,10 @@ class Work(Base): # Вакансия
     title: Mapped[str] = mapped_column(String(100), index=True)
     description: Mapped[str] = mapped_column(String(500))
 
-    time_from: Mapped[datetime] = mapped_column(DateTime(timezone=True))
-    time_to: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    work_date: Mapped[date] = mapped_column(Date, nullable=False) # День на который расчитана вакансия
+    time_to: Mapped[time] = mapped_column(Time, nullable=False) # Конечное время работы
+    time_from: Mapped[time] = mapped_column(Time, nullable=False) # Начальное время работы
+    ends_next_day: Mapped[bool] = mapped_column(Boolean,default=False,nullable=False) # Если смена переходит через полночь
 
     city: Mapped[str | None] = mapped_column(String(100), nullable=True, index=True)
     salary: Mapped[int | None] = mapped_column(nullable=True)
