@@ -1,138 +1,520 @@
-/* App.css */
+/* ==========================================================================
+   1. СБРОС И БАЗОВЫЕ НАСТРОЙКИ
+   ========================================================================== */
 
-/* Убирает разные расчёты размеров у браузера:
-   width и height теперь включают padding и border. */
-* {
+*, *::before, *::after {
+  /* Размеры элементов включают паддинги и рамку */
   box-sizing: border-box;
+  /* Убираем дефолтные внешние отступы браузера */
+  margin: 0;
+  /* Убираем дефолтные внутренние отступы */
+  padding: 0;
 }
 
-/* Стили для всего документа. */
 body {
-  margin: 0; /* Убирает стандартные внешние отступы браузера. */
-  min-width: 320px; /* Не даёт странице стать уже маленького мобильного экрана. */
-  min-height: 100vh; /* Минимальная высота — весь экран пользователя. */
-  background: #f3f6fb; /* Светлый фон всей страницы. */
-  color: #1d2939; /* Основной цвет текста. */
-  font-family: Inter, Arial, sans-serif; /* Шрифт: Inter, иначе Arial, иначе системный. */
+  /* Системный шрифт iOS / Android */
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  /* Темно-серый фон страницы снаружи мобильного фрейма при просмотре на мониторе */
+  background-color: #121513;
+  /* Основной темно-графитовый цвет текста */
+  color: #18201C;
+  /* Качественное сглаживание шрифтов */
+  -webkit-font-smoothing: antialiased;
 }
 
-/* Корневой контейнер React-приложения. */
-#root {
-  min-height: 100vh; /* Растягивает контейнер на всю высоту окна. */
-  padding: 32px 16px; /* 32px сверху/снизу, 16px слева/справа. */
+/* ==========================================================================
+   2. ГЛАВНЫЙ МОБИЛЬНЫЙ КОНТЕЙНЕР
+   ========================================================================== */
+
+.app {
+  /* Фиксированная ширина под мобильный экран (как в Figma) */
+  max-width: 390px;
+  width: 100%;
+  /* Минимальная высота на весь экран */
+  min-height: 100vh;
+  /* Светло-молочный фон экрана */
+  background-color: #F5F6F2;
+  /* Центрирование контейнера по горизонтали на экране ПК */
+  margin: 0 auto;
+  /* Запас снизу 84px, чтобы зафиксированный навбар не закрывал карточки */
+  padding-bottom: 84px;
+  /* Относительное позиционирование для дочерних абсолютных элементов */
+  position: relative;
+  /* Выстраиваем блоки строго вертикально */
+  display: flex;
+  flex-direction: column;
 }
 
-/* Твой первый div внутри App. */
-#root > div {
-  width: 100%; /* Контейнер занимает доступную ширину. */
-  max-width: 760px; /* Но не становится шире 760px на больших экранах. */
-  margin: 0 auto; /* 0 сверху/снизу, auto по бокам — центрирование. */
+/* ==========================================================================
+   3. ХЕДЕР (ШАПКА)
+   ========================================================================== */
+
+.app-header {
+  /* Внутренние отступы блока: 16px сверху и с боков, 8px снизу */
+  padding: 16px 16px 8px 16px;
+  /* Flexbox: разносим блок названия влево, колокольчик вправо */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-/* Заголовок страницы. */
-h1 {
-  margin: 0 0 24px; /* Нет отступа сверху, 24px снизу. */
-  color: #172b4d; /* Тёмно-синий цвет текста. */
-  font-size: clamp(26px, 5vw, 38px); /* Адаптивный размер: минимум 26px, максимум 38px. */
-  line-height: 1.15; /* Высота строки — 115% от размера текста. */
-  letter-spacing: -0.8px; /* Немного уменьшает расстояние между буквами. */
+.header-info {
+  display: flex;
+  flex-direction: column;
+  /* Зазор 2px между названием и выбором города */
+  gap: 2px;
 }
 
-/* Выбор города. */
-select {
-  width: 100%; /* Растягивает select на всю ширину контейнера. */
-  margin-bottom: 24px; /* Отступ до списка смен. */
-  padding: 14px 16px; /* Внутренние отступы: 14px сверху/снизу, 16px по бокам. */
-  border: 1px solid #d0d5dd; /* Тонкая светло-серая рамка. */
-  border-radius: 12px; /* Скругление углов. */
-  outline: none; /* Убирает стандартную браузерную обводку при фокусе. */
-  background: #ffffff; /* Белый фон поля. */
-  color: #1d2939; /* Цвет выбранного текста. */
-  font-size: 16px; /* Размер текста; 16px предотвращает зум на iPhone. */
-  cursor: pointer; /* Показывает курсор-руку при наведении. */
+.page-title {
+  /* Крупный жирный заголовок */
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.15;
+  color: #18201C;
 }
 
-/* Обводка select при клике или навигации с клавиатуры. */
-select:focus {
-  border-color: #4f46e5; /* Фиолетовая рамка в фокусе. */
-  box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.15); /* Мягкое внешнее свечение. */
+.city-picker {
+  display: flex;
+  align-items: center;
+  /* Отступ 4px между гео-иконкой и селектом */
+  gap: 4px;
 }
 
-/* Список вакансий. */
-ul {
-  display: grid; /* Карточки будут располагаться через CSS Grid. */
-  gap: 16px; /* Расстояние между карточками. */
-  margin: 0; /* Убирает стандартные отступы списка. */
-  padding: 0; /* Убирает стандартный внутренний отступ списка. */
-  list-style: none; /* Убирает точки у элементов списка. */
+.city-picker svg {
+  color: #69716C;
+  flex-shrink: 0;
 }
 
-/* Карточка одной смены. */
-li {
-  display: grid; /* Удобно раскладывает содержимое карточки. */
-  gap: 8px; /* Расстояние между строками внутри карточки. */
-  padding: 20px; /* Внутренние отступы карточки. */
-  border: 1px solid #e4e7ec; /* Лёгкая граница карточки. */
-  border-radius: 18px; /* Скруглённые углы. */
-  background: #ffffff; /* Белый фон. */
-  box-shadow: 0 4px 12px rgba(16, 24, 40, 0.05); /* Лёгкая тень. */
-  transition: transform 0.2s ease, box-shadow 0.2s ease; /* Плавная анимация при наведении. */
+.city-select {
+  /* Убираем дефолтную браузерную стрелку селекта */
+  appearance: none;
+  -webkit-appearance: none;
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 12px;
+  font-weight: 500;
+  color: #69716C;
+  cursor: pointer;
+  font-family: inherit;
 }
 
-/* Эффект наведения на карточку на компьютере. */
-li:hover {
-  transform: translateY(-3px); /* Поднимает карточку вверх на 3px. */
-  box-shadow: 0 12px 24px rgba(16, 24, 40, 0.1); /* Делает тень заметнее. */
+.bell-btn {
+  /* Квадратная кнопка 38x38px */
+  width: 38px;
+  height: 38px;
+  position: relative;
+  background-color: #FFFFFF;
+  border: 1px solid #E1E4DE;
+  border-radius: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #18201C;
+  cursor: pointer;
+  flex-shrink: 0;
 }
 
-/* Все абзацы внутри вакансии. */
-li p {
-  margin: 0; /* Убирает стандартные отступы у p. */
-  color: #667085; /* Серо-синий цвет второстепенной информации. */
-  font-size: 15px; /* Размер обычного текста. */
-  line-height: 1.45; /* Делает текст легче для чтения. */
+.bell-btn .dot {
+  /* Оранжевая точка уведомлений */
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  width: 7px;
+  height: 7px;
+  background-color: #FF5A36;
+  border: 1.5px solid #FFFFFF;
+  border-radius: 50%;
 }
 
-/* Первый p — название вакансии. */
-li p:first-child {
-  margin-bottom: 4px; /* Небольшой отступ после названия. */
-  color: #101828; /* Почти чёрный текст. */
-  font-size: 20px; /* Увеличенный размер названия. */
-  font-weight: 700; /* Жирное начертание. */
+/* ==========================================================================
+   4. ПОИСК И ФИЛЬТР
+   ========================================================================== */
+
+.search-section {
+  padding: 8px 16px 12px 16px;
+  display: flex;
+  /* Отступ 10px между полем ввода и кнопкой фильтра */
+  gap: 10px;
+  height: 50px;
 }
 
-/* Кнопка "Откликнуться". */
-.response {
-  width: 100%; /* На телефоне кнопка занимает всю ширину карточки. */
-  margin-top: 8px; /* Отступ между данными вакансии и кнопкой. */
-  padding: 13px 16px; /* Внутренний размер кнопки. */
-  border: none; /* Убирает стандартную рамку button. */
-  border-radius: 10px; /* Скругляет углы кнопки. */
-  background: #4f46e5; /* Основной фиолетовый цвет. */
-  color: #ffffff; /* Белый цвет текста. */
-  font-size: 16px; /* Размер текста кнопки. */
-  font-weight: 600; /* Полужирный текст. */
-  text-align: center; /* Центрирует текст. */
-  cursor: pointer; /* Показывает, что элемент кликабельный. */
-  transition: background 0.2s ease, transform 0.2s ease; /* Плавная реакция на наведение. */
+.search-field {
+  /* Занимает всю ширину кроме кнопки фильтра */
+  flex: 1;
+  background-color: #FFFFFF;
+  border: 1px solid #E1E4DE;
+  border-radius: 16px;
+  padding: 0 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-/* Состояние при наведении на кнопку. */
-.response:hover {
-  background: #4338ca; /* Чуть более тёмный фиолетовый. */
-  transform: scale(1.01); /* Немного увеличивает кнопку. */
+.search-field svg {
+  color: #69716C;
+  flex-shrink: 0;
 }
 
-/* Состояние во время нажатия. */
-.response:active {
-  transform: scale(0.98); /* Слегка уменьшает кнопку, создавая эффект нажатия. */
+.search-field input {
+  width: 100%;
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 14px;
+  color: #18201C;
+  font-family: inherit;
 }
 
-/* На широких экранах кнопка становится компактнее. */
-@media (min-width: 600px) {
-  .response {
-    width: fit-content; /* Ширина зависит от текста, а не от карточки. */
-    min-width: 180px; /* Но не меньше 180px. */
-    justify-self: end; /* Выравнивает кнопку по правому краю grid-карточки. */
-  }
+.search-field input::placeholder {
+  color: #929A95;
+}
+
+.filter-btn {
+  /* Квадрат 50x50px */
+  width: 50px;
+  height: 50px;
+  position: relative;
+  background-color: #18201C;
+  border: none;
+  border-radius: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #FFFFFF;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.filter-btn .dot {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  width: 8px;
+  height: 8px;
+  background-color: #FF5A36;
+  border: 2px solid #18201C;
+  border-radius: 50%;
+}
+
+/* ==========================================================================
+   5. КАЛЕНДАРЬ ДАТ
+   ========================================================================== */
+
+.calendar-section {
+  padding: 4px 16px 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.calendar-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.month-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: #69716C;
+  letter-spacing: 0.5px;
+}
+
+.today-btn {
+  background: none;
+  border: none;
+  font-size: 12px;
+  font-weight: 600;
+  color: #FF5A36;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.days-grid {
+  /* Ровно 5 одинаковых колонок под 5 дней */
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+}
+
+.day-card {
+  height: 62px;
+  background-color: #FFFFFF;
+  border: 1px solid #E1E4DE;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 2px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.day-name {
+  font-size: 11px;
+  font-weight: 600;
+  color: #69716C;
+}
+
+.day-num {
+  font-size: 20px;
+  font-weight: 700;
+  color: #18201C;
+  line-height: 1;
+}
+
+/* Выходные дни подсвечены оранжевыми цифрами */
+.day-card.weekend .day-num {
+  color: #FF5A36;
+}
+
+/* Выбранный активный день */
+.day-card.selected {
+  background-color: #FF5A36;
+  border-color: #FF5A36;
+}
+
+.day-card.selected .day-name {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.day-card.selected .day-num {
+  color: #FFFFFF;
+}
+
+/* ==========================================================================
+   6. ЛЕНТА СМЕН (КАРТОЧКИ)
+   ========================================================================== */
+
+.shifts-feed {
+  padding: 0 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.feed-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.feed-count {
+  font-size: 14px;
+  font-weight: 700;
+  color: #18201C;
+}
+
+.sort-btn {
+  background: none;
+  border: none;
+  font-size: 12px;
+  color: #69716C;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.cards-list {
+  display: flex;
+  flex-direction: column;
+  /* Отступ 10px между соседними карточками */
+  gap: 10px;
+}
+
+.shift-card {
+  min-height: 132px;
+  padding: 13px 13px 13px 15px;
+  position: relative;
+  background-color: #FFFFFF;
+  border: 1px solid #E1E4DE;
+  border-radius: 16px;
+  /* Мягкая тень карточки из Фигмы */
+  box-shadow: 0px 4px 14px rgba(24, 32, 28, 0.05);
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.shift-card.featured {
+  border-color: #FFE7E0;
+}
+
+.featured-stripe {
+  /* Оранжевая вертикальная плашка у первой карточки */
+  position: absolute;
+  left: 0;
+  top: 18px;
+  width: 4px;
+  height: 44px;
+  background-color: #FF5A36;
+  border-top-right-radius: 4px;
+  border-bottom-right-radius: 4px;
+}
+
+.card-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.shift-role {
+  font-size: 16px;
+  font-weight: 700;
+  color: #18201C;
+  line-height: 1.2;
+}
+
+.company-tag {
+  font-size: 12px;
+  font-weight: 500;
+  color: #69716C;
+  margin-top: 2px;
+}
+
+.geo-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: #69716C;
+  margin-top: 4px;
+}
+
+.geo-row svg {
+  color: #929A95;
+  flex-shrink: 0;
+}
+
+.tags-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.time-pill {
+  /* Капсула со временем */
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  background-color: #ECEEE8;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #18201C;
+}
+
+.experience-badge {
+  /* Зеленая подпись «Без опыта / С опытом» */
+  font-size: 11px;
+  font-weight: 500;
+  color: #16835F;
+}
+
+.card-action {
+  /* Правая колонка с ценой и кнопкой */
+  width: 102px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-shrink: 0;
+}
+
+.pay-block {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.pay-amount {
+  font-size: 20px;
+  font-weight: 700;
+  color: #FF5A36;
+  line-height: 1.1;
+}
+
+.pay-period {
+  font-size: 11px;
+  color: #69716C;
+}
+
+.apply-btn {
+  width: 102px;
+  height: 32px;
+  background-color: #18201C;
+  border: none;
+  border-radius: 12px;
+  color: #FFFFFF;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: inherit;
+}
+
+.apply-btn.primary {
+  background-color: #FF5A36;
+}
+
+/* ==========================================================================
+   7. НИЖНЯЯ ПАНЕЛЬ НАВИГАЦИИ (ТАББАР)
+   ========================================================================== */
+
+.bottom-nav {
+  /* Фиксируем внизу экрана */
+  position: fixed;
+  bottom: 0;
+  /* Ограничиваем ширину ровно шириной мобильного экрана */
+  width: 100%;
+  max-width: 390px;
+  height: 64px;
+  padding: 4px 8px;
+  background-color: #FCFDFB;
+  /* Мягкая тень наверх */
+  box-shadow: 0px -4px 16px rgba(24, 32, 28, 0.07);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 100;
+}
+
+.tab-btn {
+  flex: 1;
+  background: none;
+  border: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 2px;
+  color: #69716C;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.tab-pill {
+  width: 36px;
+  height: 28px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tab-btn.active {
+  color: #FF5A36;
+  font-weight: 700;
+}
+
+.tab-btn.active .tab-pill {
+  background-color: #FFE7E0;
 }
