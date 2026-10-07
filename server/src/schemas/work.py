@@ -99,3 +99,4 @@ class WorkFiltersResponse(BaseModel):
         time_to: time
 
         city: str | None
+        company_name: str | None

@@ -6,6 +6,7 @@ from db.database import session_factory
 from models.models import Company, Work
 from schemas.work import WorkCreate, WorkUpdate
 from sqlalchemy import func, select
+from sqlalchemy.orm import joinedload
 
 
 async def create_work(data: WorkCreate, company_id: int) -> int: # Создания вакансии
@@ -96,6 +97,7 @@ async def get_works(page: int = 1,per_page: int = 10,city: str | None = None,wor
         stmt = (
             stmt
             .order_by(Work.work_date.asc(), Work.time_from.asc())
+            .options(joinedload(Work.company))
             .offset(offset)
             .limit(per_page)
         )
@@ -112,6 +114,7 @@ async def get_works(page: int = 1,per_page: int = 10,city: str | None = None,wor
                 "time_from": work.time_from,
                 "time_to": work.time_to,
                 "city": work.city,
+                "company_name": work.company.name if work.company else None,
             }
             for work in works
         ]

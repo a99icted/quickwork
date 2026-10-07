@@ -70,6 +70,7 @@ const BellIcon = () => (
 
 
 function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(Boolean(localStorage.getItem("token")));
   const [shifts, setShifts] = useState([]);
   const [city, setCity] = useState("Белград");
   const [selectedDate, setSelectedDate] = useState(getLocalDateString());
@@ -98,6 +99,47 @@ function App() {
         console.error("Ошибка при получении смен:", error);
       });
   }, [city, selectedDate]);
+
+  // Функция для отправки отклика на смену
+  const handleApply = async (workId) => {
+    const token = localStorage.getItem("token");
+
+    try {
+      const response = await fetch(`http://localhost:8000/uwe/add_work?work_id=${workId}`, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (response.status === 401) {
+        // Если токен протух или невалиден
+        localStorage.removeItem("token");
+        setIsAuthenticated(false);
+        alert("Сессия устарела. Войдите снова.");
+        return;
+      }
+
+      if (response.status === 409) {
+        alert("Вы уже откликнулись на эту смену!");
+        return;
+      }
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || "Не удалось откликнуться");
+      }
+
+      alert("Вы успешно откликнулись на смену!");
+    } catch (error) {
+      console.error("Ошибка отклика:", error);
+      alert(error.message);
+    }
+  };
+
+
+
 
   return (
     <div className="app">
@@ -166,8 +208,8 @@ function App() {
               {index === 0 && <div className="featured-stripe" />}
 
               <div className="card-info">
-                <h2 className="shift-role">{shift.title || shift.job_title || "Работник торгового зала"}</h2>
-                <span className="company-tag">{shift.company || shift.company_name || "Торговая сеть"}</span>
+                <h2 className="shift-role">{shift.title || "Работник торгового зала"}</h2>
+                <span className="company-tag">{shift.company_name || "Торговая сеть"}</span>
 
                 <div className="geo-row">
                   <LocationIcon />
@@ -181,7 +223,8 @@ function App() {
                       <polyline points="12 6 12 12 16 14" />
                     </svg>
                     <span>
-                      {formatTime(shift.start_time || "10:00")}–{formatTime(shift.end_time || "18:00")}
+                      {formatTime(shift.time_from || shift.start_time || "10:00")}–
+                      {formatTime(shift.time_to || shift.end_time || "18:00")}
                     </span>
                   </div>
                   <span className="experience-badge">{shift.tag || "Без опыта"}</span>
@@ -190,16 +233,23 @@ function App() {
 
               <div className="card-action">
                 <div className="pay-block">
-                  <span className="pay-amount">{shift.pay_amount || shift.price || "4 000"} RSD</span>
+                  <span className="pay-amount">
+                    {shift.salary ? `${shift.salary} RSD` : "Не уточнена"}
+                  </span>
                   <span className="pay-period">{shift.pay_type || "за смену"}</span>
                 </div>
 
-                <button
-                  type="button"
-                  className={`apply-btn ${index === 0 ? "primary" : ""}`}
-                >
-                  Откликнуться
-                </button>
+                {isAuthenticated && (
+                  <button
+                    type="button"
+                    className={`apply-btn ${index === 0 ? "primary" : ""}`}
+                    onClick={() => handleApply(shift.id)}
+                  >
+                    Откликнуться
+                  </button>
+                )}
+
+
               </div>
             </article>
           ))}
