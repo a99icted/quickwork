@@ -21,6 +21,8 @@ from schemas.company import (
 
 router = APIRouter(prefix="/company", tags=["Company"])
 
+
+
 @router.post("/create", response_model=CompanyCreateResponse, status_code=status.HTTP_201_CREATED) # Создать компанию
 async def company_create(data: CompanyCreate, current_user: User = Depends(get_current_user),) -> CompanyCreateResponse:
     try:

@@ -1,28 +1,31 @@
 from datetime import datetime
-from typing import Literal
 
 from models.models import Status
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
-
-class UserWorkAdd(BaseModel):
-    work_id: int
-    user_id: int
 
 class UserWorkUpdate(BaseModel):
     user_id: int
     work_id: int
-    status: Literal[Status.PENDING, Status.APPROVED, Status.REJECTED] = Field(default=Status.PENDING)
-
-class UserWorkResponse(BaseModel):
-    user_id: int
-    work_id: int
-    status: Literal[Status.PENDING, Status.APPROVED, Status.REJECTED] = Field(default=Status.PENDING)
+    status: Status = Field(default=Status.PENDING)
 
 class UserWorkUpdateResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     user_id: int
     work_id: int
-    message: str
+    status: Status
+
+class UserWorkResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    user_id: int
+    work_id: int
+    status: Status
+
+class UserWorkAdd(BaseModel):
+    work_id: int
+    user_id: int
 
 class WorkResponse(BaseModel):
     id: int

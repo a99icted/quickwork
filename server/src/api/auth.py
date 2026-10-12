@@ -14,6 +14,9 @@ from services.auth import authenticate_user
 
 router = APIRouter(prefix="/auth",tags=["Auth"])
 
+
+
+
 @router.post("/register", # Ручка
     response_model=UserRegisterResponse, # Модель, которая формирует ответ
     status_code=status.HTTP_201_CREATED,) # Статус ответа в случае успеха
@@ -40,17 +43,6 @@ async def login(data: UserLogin) -> TokenResponse:
         return TokenResponse(
                 access_token=access_token,
             )
-
-@router.get("/me", response_model=CurrentUserResponse) # Получение информации о пользователе
-async def get_me(user: User = Depends(get_current_user),) -> CurrentUserResponse:
-
-    return CurrentUserResponse(
-            id=user.id,
-            username= user.username,
-            first_name= user.first_name,
-            last_name= user.last_name,
-            age= user.age,
-    )
 
 @router.post("/logout", status_code=status.HTTP_204_NO_CONTENT,)
 async def logout(_: User=Depends(get_current_user)) -> None: # Пока не имеет смысла, логаут обычно происходит через фронтенд

@@ -1,8 +1,8 @@
-from core.exceptions import AlreadyExistsError, NotFoundError
+from core.exceptions import AlreadyExistsError, NotFoundError, ValueError
 from core.security import hash_password
 from db.database import session_factory
 from models.models import User
-from schemas.user import UserCreate
+from schemas.user import UserCreate, UserUpdate
 from sqlalchemy import select
 
 
@@ -48,3 +48,31 @@ async def get_user_by_id(user_id: int) -> User | None: # Получение юз
         user = await session.scalar(select(User).where(User.id == user_id))
 
         return user
+
+
+async def update_user(user_id: int, data: UserUpdate):
+    async with (session_factory() as session, session.begin()):
+        result = await session.execute(select(User).where(User.id == user_id))
+
+        user = result.scalar_one_or_none()
+
+        if user is None:
+            raise NotFoundError("Пользователь не найден")
+
+        update_data = data.model_dump(exclude_unset=True)
+
+        if "first_name" in update_data and update_data["first_name"] is None:
+            raise ValueError("first_name не должен быть пустым")
+
+        if "last_name" in update_data and update_data["last_name"] is None:
+            raise ValueError("last_name не должен быть пустым")
+
+        if "age" in update_data and update_data["age"] is None:
+            raise ValueError("age не должен быть пустым")
+
+        for field, value in update_data.items():
+            setattr(user, field, value)
+
+        await session.flush()
+
+        return user.id

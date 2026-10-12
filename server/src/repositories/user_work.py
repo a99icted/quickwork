@@ -1,6 +1,7 @@
 from core.exceptions import AlreadyExistsError, NotFoundError
 from db.database import session_factory
 from models.models import Company, User, UserWork, Work
+from schemas.user_work import UserWorkUpdate
 from sqlalchemy import select
 
 
@@ -18,14 +19,31 @@ async def create_user_work(user_id: int, work_id: int) -> UserWork: # Юзер �
         await session.refresh(user_work)
         return user_work
 
-async def update_status(user_id: int, work_id: int, status: str):
+
+async def update_status(current_user_id: int, data: UserWorkUpdate) -> UserWork:
     async with session_factory() as session:
-        user_work = await session.get(UserWork, (user_id, work_id))
-        if user_work:
-            user_work.status = status
-            await session.commit()
-        else:
-            raise NotFoundError("Пользователь не найден")
+        # Проверяем связь заявки с вакансией компании текущего пользователя
+        stmt = (
+            select(UserWork)
+            .join(Work, UserWork.work_id == Work.id)
+            .join(Company, Work.company_id == Company.id)
+            .where(
+                Company.user_id == current_user_id,
+                UserWork.work_id == data.work_id,
+                UserWork.user_id == data.user_id,
+            )
+        )
+        result = await session.execute(stmt)
+        user_work = result.scalar_one_or_none()
+
+        if not user_work:
+            raise NotFoundError("Заявка не найдена или у вас нет прав на её изменение")
+
+        user_work.status = data.status
+        await session.commit()
+        await session.refresh(user_work)
+
+        return user_work
 
 
 async def get_user_works(user_id: int): # Юзер получает свои отклики
