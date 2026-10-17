@@ -66,17 +66,21 @@ class WorkUpdate(BaseModel):
 class DeleteWork(BaseModel): # Удаление вакансии - уже не нужно
     vacancy_id: int
 
+
 class DeleteWorkResponse(BaseModel): # Ответ после успешного удаления
     vacancy_id: int
     message: str
+
 
 class WorkUpdateResponse(BaseModel): # Ответ после успешного обновления
     vacancy_id: int
     message: str
 
+
 class WorkCreateResponse(BaseModel): # Ответ после создания вакансии
     vacancy_id: int
     message: str
+
 
 class WorkFilters(BaseModel):
     city: str | None = Field(
@@ -88,6 +92,7 @@ class WorkFilters(BaseModel):
 
     page: int = Field(default=1, ge=1)
     per_page: int = Field(default=10, ge=1, le=100)
+
 
 class WorkFiltersResponse(BaseModel):
         id: int

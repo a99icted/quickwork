@@ -860,3 +860,206 @@ body {
   /* Зазор 16px снизу до формы */
   margin-bottom: 16px;
 }
+
+/* ==========================================================================
+   10. СТРАНИЦА ВАКАНСИИ (.shift-page) — АДАПТИВ
+   ========================================================================== */
+
+.shift-page {
+  max-width: 390px;              /* как у .app: не шире мобильного макета */
+  width: 100%;                   /* на узком телефоне занимает весь экран */
+  min-height: 100vh;             /* экран не короче высоты окна */
+  min-height: 100dvh;            /* 100dvh учитывает выезжающую панель браузера на мобилках */
+  margin: 0 auto;                /* центрирует фрейм на десктопе */
+  background-color: #F5F6F2;     /* тот же молочный фон, что у ленты */
+  padding-bottom: calc(84px + env(safe-area-inset-bottom, 0px));
+  /* 84px под таббар + безопасная зона iPhone (home indicator) */
+  position: relative;            /* якорь для absolute/sticky внутри */
+  display: flex;                 /* колонка: статус / контент / кнопка */
+  flex-direction: column;        /* блоки идут сверху вниз */
+  box-sizing: border-box;        /* padding не раздувает ширину за 100% */
+  overflow-x: hidden;            /* длинный адрес не даёт горизонтальный скролл */
+}
+
+.shift-detail {
+  width: 100%;                   /* на всю ширину фрейма */
+  padding: 12px 16px 24px;       /* 12 сверху, 16 с боков, 24 снизу до CTA */
+  display: flex;                 /* секции друг под другом */
+  flex-direction: column;        /* вертикальный поток */
+  gap: 14px;                     /* одинаковый зазор между блоками */
+  box-sizing: border-box;        /* padding внутри ширины */
+  flex: 1;                       /* растягивает main, если контента мало */
+}
+
+.back-btn {
+  align-self: flex-start;        /* кнопка по ширине текста, не на весь ряд */
+  border: none;                  /* без браузерной рамки */
+  background: transparent;       /* без заливки */
+  padding: 4px 0;                /* чуть больше зона тапа по вертикали */
+  margin: 0;                     /* без лишних внешних отступов */
+  color: #69716C;                /* вторичный серый, как город в шапке */
+  font-size: 13px;               /* читаемо, не конкурирует с заголовком */
+  font-weight: 600;              /* чуть жирнее обычного текста */
+  font-family: inherit;          /* системный шрифт приложения */
+  cursor: pointer;               /* рука на десктопе */
+}
+
+.shift-hero {
+  display: flex;                 /* заголовок слева, зарплата справа */
+  justify-content: space-between;/* разносит колонки по краям */
+  align-items: flex-start;       /* по верхнему краю, если заголовок в 2 строки */
+  gap: 12px;                     /* зазор, когда колонки рядом */
+}
+
+.shift-hero-text {
+  flex: 1;                       /* забирает всё место кроме зарплаты */
+  min-width: 0;                  /* КРИТИЧНО: иначе длинный title не переносится */
+}
+
+.shift-title {
+  margin: 0 0 6px;               /* сброс h1, 6px до названия компании */
+  font-size: clamp(20px, 5.6vw, 24px);
+  /* 20px на узких, растёт с шириной экрана, максимум 24px */
+  font-weight: 700;              /* жирный заголовок, как .page-title */
+  line-height: 1.2;              /* плотные строки без наложения */
+  color: #18201C;                /* основной графитовый */
+  overflow-wrap: anywhere;       /* длинные слова ломаются, а не вылезают */
+}
+
+.shift-page .company-tag {
+  display: inline-block;         /* тег не растягивается на всю строку */
+  margin-top: 0;                 /* отступ уже даёт заголовок */
+}
+
+.shift-page .pay-block {
+  flex-shrink: 0;                /* зарплата не сжимается в кашу */
+  align-items: flex-end;         /* сумма и «за смену» по правому краю */
+}
+
+.shift-page .pay-amount {
+  font-size: clamp(18px, 5vw, 22px); /* крупная цена, но не ломает узкий экран */
+  white-space: nowrap;           /* «4500 RSD» не рвётся на две строки */
+}
+
+.shift-meta {
+  display: flex;                 /* адрес и теги столбиком */
+  flex-direction: column;
+  gap: 8px;                      /* зазор между адресом и пилюлями */
+}
+
+.shift-page .geo-row {
+  margin-top: 0;                 /* свой gap вместо старого margin-top карточки */
+  font-size: 12px;               /* чуть крупнее, чем в ленте: это уже деталь */
+  overflow-wrap: anywhere;       /* длинный адрес переносится */
+}
+
+.shift-page .tags-row {
+  margin-top: 0;                 /* отступ задаёт gap родителя */
+  flex-wrap: wrap;               /* пилюля + бейдж уезжают на вторую строку при нехватке места */
+}
+
+.shift-section {
+  background-color: #FFFFFF;     /* белая карточка, как shift-card */
+  border: 1px solid #E1E4DE;     /* та же обводка */
+  border-radius: 16px;           /* то же скругление */
+  padding: 14px 14px 16px;       /* внутренние поля текста */
+  box-shadow: 0px 4px 14px rgba(24, 32, 28, 0.05); /* лёгкая тень карточки */
+}
+
+.shift-section h2 {
+  margin: 0 0 8px;               /* заголовок секции, 8px до текста */
+  font-size: 14px;               /* меньше главного title */
+  font-weight: 700;
+  color: #18201C;
+}
+
+.shift-section p {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;              /* удобное чтение длинного описания */
+  color: #18201C;
+  overflow-wrap: anywhere;       /* ссылки/слова без пробелов не раздвигают экран */
+  white-space: pre-wrap;         /* сохраняет переносы строк с бэка */
+}
+
+.shift-cta {
+  position: sticky;              /* кнопка едет вместе со скроллом и липнет внизу */
+  bottom: calc(72px + env(safe-area-inset-bottom, 0px));
+  /* над таббаром 64px + небольшой зазор, с учётом челки iPhone */
+  z-index: 90;                   /* выше контента, ниже таббара (у него 100) */
+  padding-top: 4px;
+}
+
+.shift-cta .apply-btn {
+  width: 100%;                   /* на странице вакансии кнопка на всю ширину, не 102px с ленты */
+  height: 48px;                  /* палец, как login-submit-btn */
+  border-radius: 14px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.shift-cta .apply-btn.done {
+  background-color: #16835F;     /* зелёный «отклик отправлен», как бейдж опыта */
+}
+
+.shift-status {
+  padding: 40px 16px;            /* воздух вокруг статуса загрузки */
+  text-align: center;            /* по центру фрейма */
+  font-size: 14px;
+  font-weight: 600;
+  color: #69716C;
+}
+
+.shift-status.error {
+  color: #FF5A36;                /* ошибка акцентным оранжевым */
+}
+
+.shift-page > .back-btn {
+  margin: 0 16px 8px;            /* на экране ошибки кнопка не прилипает к краю */
+}
+
+/* --- очень узкие телефоны (iPhone SE / 320–359px) --- */
+@media (max-width: 359px) {
+  .shift-detail {
+    padding: 10px 12px 20px;     /* меньше боковые поля, контент не давит */
+    gap: 12px;
+  }
+
+  .shift-hero {
+    flex-direction: column;      /* заголовок и цена столбиком, не сжимаются */
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .shift-page .pay-block {
+    align-items: flex-start;     /* цена слева, как заголовок */
+  }
+
+  .shift-section {
+    padding: 12px;               /* карточка описания чуть компактнее */
+  }
+
+  .shift-cta .apply-btn {
+    height: 46px;                /* чуть ниже, больше места под таббар */
+  }
+}
+
+/* --- обычный смартфон и шире (360px+) — макет как в Figma --- */
+@media (min-width: 360px) {
+  .shift-detail {
+    padding: 12px 16px 24px;
+  }
+}
+
+/* --- планшет / монитор: тот же мобильный фрейм, только крупнее воздух --- */
+@media (min-width: 768px) {
+  .shift-page {
+    max-width: 430px;            /* чуть шире 390, но всё ещё «приложение», не десктоп-сайт */
+    min-height: 100vh;
+  }
+
+  .shift-title {
+    font-size: 24px;             /* на большом экране фиксированный крупный заголовок */
+  }
+}

@@ -60,6 +60,7 @@ async def comapany_delete(current_user: User = Depends(get_current_user),) -> Co
 
     return CompanyDeleteResponse(company_id=company_id, message="Компания успешно удалена")
 
+
 @router.get('/companies', response_model=list[CompanyResponse], status_code=status.HTTP_200_OK) # Получить список компаний
 async def get_companies() -> list[CompanyResponse]:
     try:

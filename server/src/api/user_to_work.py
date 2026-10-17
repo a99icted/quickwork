@@ -7,9 +7,15 @@ from repositories.user_work import (
     create_user_work,
     get_responses_company,
     get_user_works,
-    update_status
+    update_status,
 )
-from schemas.user_work import ResponseItem, UserWorkResponse, WorkResponse,UserWorkUpdateResponse, UserWorkUpdate
+from schemas.user_work import (
+    ResponseItem,
+    UserWorkResponse,
+    UserWorkUpdate,
+    UserWorkUpdateResponse,
+    WorkResponse,
+)
 
 # обновление статуса вакансии компанией
 

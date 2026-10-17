@@ -10,9 +10,16 @@ function formatTime(time) {
   return time.slice(0, 5);
 }
 
-const ShiftCard = ({ shift, isFeatured, isAuthenticated, onApply }) => {
+
+const ShiftCard = ({ shift, isFeatured, isAuthenticated, onApply, onOpen }) => {
   return (
-    <article className={`shift-card ${isFeatured ? "featured" : ""}`}>
+    <article
+      className={`shift-card ${isFeatured ? "featured" : ""}`}
+      onClick={(e) => {
+        if (e.target.closest(".apply-btn")) return;
+        onOpen?.(shift.id);
+      }}
+    >
       {isFeatured && <div className="featured-stripe" />}
 
       <div className="card-info">

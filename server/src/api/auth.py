@@ -4,7 +4,6 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from models.models import User
 from repositories.user import AlreadyExistsError, create_user
 from schemas.user import (
-    CurrentUserResponse,
     TokenResponse,
     UserCreate,
     UserLogin,

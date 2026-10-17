@@ -210,6 +210,7 @@ function Shifts() {
               isFeatured={index === 0}
               isAuthenticated={true}
               onApply={handleApply}
+              onOpen={(id) => navigate(`/work/${id}`)}
             />
           ))}
         </div>
