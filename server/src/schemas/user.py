@@ -12,7 +12,7 @@ class UserCreate(BaseModel): # Валидация данных при регис
     first_name: str = Field(min_length=1, max_length=25)
     last_name: str = Field(min_length=1, max_length=25)
     age: int = Field(ge=16, le=100)
-    role: Role = Field(default=Role.WORKER)
+    role: Literal[Role.WORKER] = Role.WORKER
 
 class UserUpdate(BaseModel):
     first_name: str = Field(min_length=1, max_length=25)
@@ -26,9 +26,11 @@ class UserLogin(BaseModel): # Модель валидации данных дл�
 class TokenResponse(BaseModel): # jwt токен
     access_token: str
     token_type: Literal["bearer"] = "bearer"
+    expires_in: int
 
 class CurrentUserResponse(BaseModel): # Данные пользователя после аунтификации и получения токена
     id: int
+    role: Role
     username: str
     first_name: str | None
     last_name: str | None

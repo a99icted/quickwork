@@ -11,6 +11,7 @@ async def get_me(user: User = Depends(get_current_user),) -> CurrentUserResponse
 
     return CurrentUserResponse(
             id=user.id,
+            role=user.role,
             username= user.username,
             first_name= user.first_name,
             last_name= user.last_name,

@@ -4,6 +4,7 @@ from repositories.category import create_category
 from repositories.features import create_feature
 from schemas.category import CategoryAdd
 from schemas.features import FeatureAdd
+from core.exceptions import AlreadyExistsError
 
 
 async def init_db(): # Создаем базу данных
@@ -16,12 +17,16 @@ async def recreate_db(): # Дропает содержимое базы данн
         await conn.run_sync(Base.metadata.create_all)
 
 async def add_category():
-    await create_category(CategoryAdd(name="Уборка", slug="cleaning"))
-    await create_category(CategoryAdd(name="Общепит", slug="eating"))
-    await create_category(CategoryAdd(name="Торговый зал", slug="super_shop"))
+    for name, slug in (("Уборка", "cleaning"), ("Общепит", "eating"), ("Торговый зал", "super_shop")):
+        try:
+            await create_category(CategoryAdd(name=name, slug=slug))
+        except AlreadyExistsError:
+            pass
 
 
 async def add_feture():
-    await create_feature(FeatureAdd(name="Нужена медкнижка"))
-    await create_feature(FeatureAdd(name="Работы в неприятных условиях"))
-    await create_feature(FeatureAdd(name="Нужен паспорт"))
+    for name in ("Нужна медкнижка", "Работы в неприятных условиях", "Нужен паспорт"):
+        try:
+            await create_feature(FeatureAdd(name=name))
+        except AlreadyExistsError:
+            pass

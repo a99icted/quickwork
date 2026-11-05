@@ -6,7 +6,7 @@ from sqlalchemy import select
 
 
 async def create_feature(data: FeatureAdd): # Добавить особенности для вакансии
-    async with session_factory() as session:
+    async with session_factory() as session, session.begin():
         category = await session.scalar(select(Feature).where(Feature.name == data.name))
 
         if category:

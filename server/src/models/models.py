@@ -6,6 +6,39 @@ from sqlalchemy import Boolean, Date, DateTime, Enum, ForeignKey, Integer, Strin
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 
+class WorkCategory(Base):
+    __tablename__ = 'work_categories'
+
+    work_id: Mapped[int] = mapped_column(ForeignKey('works.id', ondelete='CASCADE'), primary_key=True)
+    category_id: Mapped[int] = mapped_column(ForeignKey('categories.id', ondelete='RESTRICT'), primary_key=True)
+
+
+class WorkFeature(Base):
+    __tablename__ = 'work_features'
+
+    work_id: Mapped[int] = mapped_column(ForeignKey('works.id', ondelete='CASCADE'), primary_key=True)
+    feature_id: Mapped[int] = mapped_column(ForeignKey('features.id', ondelete='RESTRICT'), primary_key=True)
+
+
+class RefreshSession(Base):
+    __tablename__ = 'refresh_sessions'
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey('users.id', ondelete='CASCADE'), index=True)
+    token_hash: Mapped[str] = mapped_column(String(64), unique=True, index=True)
+    family_id: Mapped[str] = mapped_column(String(32), index=True)
+    expires_at: Mapped[datetime] = mapped_column(DateTime)
+    revoked: Mapped[bool] = mapped_column(Boolean, default=False)
+
+
+class City(Base):
+    __tablename__ = 'cities'
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(String(100))
+    name_key: Mapped[str] = mapped_column(String(100), unique=True, index=True)
+
+
 class Role(str, enum.Enum):
     WORKER = 'worker'
     EMPLOYER = 'employer'
@@ -80,10 +113,14 @@ class Work(Base): # Вакансия
     category_id: Mapped[int] = mapped_column(ForeignKey('categories.id', ondelete="RESTRICT"), nullable=False)
     category: Mapped["Category"] = relationship(back_populates='works')
 
+    # Keep the first selection in the old columns for existing API clients.
+    categories: Mapped[list["Category"]] = relationship(secondary=WorkCategory.__table__, lazy='selectin', order_by='Category.id')
+    feature_items: Mapped[list["Feature"]] = relationship(secondary=WorkFeature.__table__, lazy='selectin', order_by='Feature.id')
+
     company_id: Mapped[int] = mapped_column(ForeignKey("companies.id", ondelete="CASCADE"), nullable=False, )
     company: Mapped["Company"] = relationship(back_populates="works",)
 
-    applications: Mapped[list["UserWork"]] = relationship(back_populates='work')
+    applications: Mapped[list["UserWork"]] = relationship(back_populates='work', cascade="all, delete-orphan")
 
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
 

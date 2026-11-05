@@ -10,6 +10,7 @@ from repositories.work import (
     delete_work,
     get_work,
     get_works,
+    get_work_options,
     update_work,
 )
 from schemas.work import (
@@ -41,6 +42,11 @@ async def create_vacancy(data: WorkCreate,current_user: User = Depends(get_curre
 
     except NotFoundError as error:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="Компания не найдена",) from error
+
+    except ValueError as error:
+        raise HTTPException(status_code=422, detail=str(error)) from error
+    except IntegrityError as error:
+        raise HTTPException(status_code=409, detail="Справочники изменились. Обновите страницу.") from error
 
     return WorkCreateResponse(vacancy_id=vacancy_id,message="Вакансия успешно создана",)
 
@@ -103,6 +109,19 @@ async def get_vacancies(filters: WorkFilters = Depends(),):
         page=filters.page,
         per_page=filters.per_page,
     )
+
+
+@router.get("/options")
+async def vacancy_options():
+    return await get_work_options()
+
+
+@router.get("/mine", response_model=list[WorkFiltersResponse])
+async def own_vacancies(page: int = Query(default=1, ge=1), per_page: int = Query(default=100, ge=1, le=100), current_user: User = Depends(get_current_user)):
+    company_id = await get_company_id_by_user_id(current_user.id)
+    if company_id is None:
+        return []
+    return await get_works(company_id=company_id, page=page, per_page=per_page)
 
 
 @router.get("/{vacancy_id}")

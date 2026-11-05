@@ -1,16 +1,31 @@
-# React + Vite
+# QuickWork · frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React 19, React Router 7, Vite, Lucide React. Адаптивный интерфейс разовых смен с личным кабинетом и компанией внутри одного аккаунта.
 
-Currently, two official plugins are available:
+```powershell
+npm install
+npm run dev
+```
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Открыть http://127.0.0.1:5173. Для загрузки данных и работы с аккаунтом нужен запущенный API на порту 8000. Полная инструкция запуска API, сборки и проверок — в [README проекта](../README.md).
 
-## React Compiler
+```powershell
+npm run lint
+npm test
+npm run build
+```
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Структура:
 
-## Expanding the ESLint configuration
+- `src/pages/` — каталог, карточка, отклики, профиль, авторизация, компания, редактор смен и кандидаты.
+- `src/components/` — общая навигация, карточки, кнопки, модальные окна и состояния.
+- `src/state/` — состояние аккаунта и действия с API.
+- `src/lib/api.js` — единый HTTP-клиент, обработка ошибок, автоматическое обновление access-токена через HttpOnly refresh-cookie и пагинация.
+- `src/lib/format.js` — даты, время, длительность смен и RSD.
+- `src/App.css` — оформление и адаптивные брейкпоинты.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+API по умолчанию доступно через `/api`. Для другого адреса задайте `VITE_API_URL` (см. `.env.example`). В разработке настроен Vite proxy, готовую сборку раздаёт FastAPI. Вложения в избранное сохраняются в браузере отдельно для каждого пользователя.
+
+Админка доступна по /admin после назначения существующему пользователю роли через server/src/manage_admin.py. Инструкции — в основном README. Города, категории и особенности поступают из API; при публикации требуется минимум одна категория и одна особенность, допускается выбор нескольких.
+
+Access-токен хранится в памяти приложения, refresh-токен — в HttpOnly-cookie. После перезагрузки вход восстанавливается через API. Настройки сроков, HTTPS/cookie и описание ротации приведены в основном README.
