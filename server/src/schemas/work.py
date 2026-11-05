@@ -1,9 +1,42 @@
 from datetime import date, time
 
+from typing import Annotated
+
 from pydantic import BaseModel, Field, model_validator
 
 
-class WorkCreate(BaseModel):
+Selection = list[Annotated[int, Field(strict=True, ge=1)]]
+
+
+class WorkSelections(BaseModel):
+    category_ids: Selection | None = Field(default=None, min_length=1)
+    feature_ids: Selection | None = Field(default=None, min_length=1)
+    # Compatibility for existing clients: a scalar is a one-item selection.
+    category_id: int | None = Field(default=None, ge=1)
+    features_id: int | None = Field(default=None, ge=1)
+
+    @model_validator(mode='before')
+    @classmethod
+    def normalize_selections(cls, values):
+        if not isinstance(values, dict):
+            return values
+        values = dict(values)
+        for plural, scalar in [('category_ids', 'category_id'), ('feature_ids', 'features_id')]:
+            if scalar in values:
+                if values[scalar] is None:
+                    raise ValueError(f'{scalar} не может быть пустым')
+                if plural in values and values[plural] != [values[scalar]]:
+                    raise ValueError(f'Используйте только {plural} либо {scalar}')
+                values.setdefault(plural, [values[scalar]])
+            if plural in values:
+                if values[plural] is None:
+                    raise ValueError(f'{plural}: выберите хотя бы один пункт')
+                if isinstance(values[plural], list) and len(values[plural]) != len(set(str(item) for item in values[plural])):
+                    raise ValueError(f'{plural}: повторяющиеся значения недопустимы')
+        return values
+
+
+class WorkCreate(WorkSelections):
     title: str = Field(min_length=1, max_length=100)
     description: str = Field(min_length=1, max_length=500)
 
@@ -16,8 +49,11 @@ class WorkCreate(BaseModel):
     city: str | None = Field(default=None, max_length=100)
     salary: int | None = Field(default=None, ge=0)
 
-    features_id: int = Field(ge=1)
-    category_id: int = Field(ge=1)
+    @model_validator(mode='after')
+    def require_selections(self):
+        if not self.category_ids or not self.feature_ids:
+            raise ValueError('Выберите хотя бы одну категорию и одну особенность работы')
+        return self
 
     # смена не может заканчиваться раньше, чем началась
     @model_validator(mode='after')
@@ -30,7 +66,7 @@ class WorkCreate(BaseModel):
         return self
 
 
-class WorkUpdate(BaseModel):
+class WorkUpdate(WorkSelections):
     title: str | None = Field(default=None, min_length=1, max_length=100)
     description: str | None = Field(default=None, min_length=1, max_length=500)
 
@@ -42,25 +78,6 @@ class WorkUpdate(BaseModel):
     city: str | None = Field(default=None, max_length=100)
     salary: int | None = Field(default=None, ge=0)
 
-    features_id: int | None = Field(default=None, ge=1)
-    category_id: int | None = Field(default=None, ge=1)
-
-    @model_validator(mode="after")
-    def check_time_logic(self) -> "WorkUpdate":
-        # Валидируем время, только если клиент прислал обе границы.
-        if self.time_from is None or self.time_to is None:
-            return self
-
-        # Если ends_next_day не прислали — считаем, что смена в те же сутки.
-        is_night_shift = self.ends_next_day is True
-
-        if not is_night_shift and self.time_to <= self.time_from:
-            raise ValueError(
-                "Время окончания должно быть позже времени начала. "
-                "Для ночной смены передай ends_next_day=true."
-            )
-
-        return self
 
 
 class DeleteWork(BaseModel): # Удаление вакансии - уже не нужно
@@ -84,7 +101,7 @@ class WorkCreateResponse(BaseModel): # Ответ после создания в
 
 class WorkFilters(BaseModel):
     city: str | None = Field(
-        default="Novi-sad",
+        default=None,
         min_length=1,
         max_length=100,
     )
@@ -105,3 +122,10 @@ class WorkFiltersResponse(BaseModel):
 
         city: str | None
         company_name: str | None
+        company_id: int
+        description: str
+        category_id: int
+        features_id: int
+        category_ids: list[int]
+        feature_ids: list[int]
+        ends_next_day: bool

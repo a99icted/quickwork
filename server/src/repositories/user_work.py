@@ -2,6 +2,7 @@ from core.exceptions import AlreadyExistsError, NotFoundError
 from db.database import session_factory
 from models.models import Company, User, UserWork, Work
 from schemas.user_work import UserWorkUpdate
+from repositories.work import serialize_work
 from sqlalchemy import select
 
 
@@ -49,13 +50,19 @@ async def update_status(current_user_id: int, data: UserWorkUpdate) -> UserWork:
 async def get_user_works(user_id: int): # Юзер получает свои отклики
     async with session_factory() as session:
         query = (
-            select(Work)
+            select(Work, UserWork.status, Company.name)
             .join(UserWork, UserWork.work_id == Work.id)
+            .join(Company, Work.company_id == Company.id)
             .where(UserWork.user_id == user_id)
         )
 
         result = await session.execute(query)
-        return result.scalars().all()
+        return [
+            {
+                **serialize_work(work, company_name), "status": response_status,
+            }
+            for work, response_status, company_name in result.all()
+        ]
 
 
 async def get_user_work(user_id: int, work_id: int):
@@ -74,21 +81,25 @@ async def get_responses_company(user_id: int) -> list: # НУЖНО ОБЯЗАТ
         if company is None:
             raise NotFoundError("Компания не найдена")
 
-        query = (select(Work, User).join(UserWork, UserWork.work_id == Work.id).join(User, UserWork.user_id == User.id).where(Work.company_id == company.id))
+        query = (select(Work, User, UserWork.status).join(UserWork, UserWork.work_id == Work.id).join(User, UserWork.user_id == User.id).where(Work.company_id == company.id))
         result = await session.execute(query)
 
         responses = []
 
-        for work, user in result.all():
+        for work, user, response_status in result.all():
                     responses.append({
                         "work": {
                             "id": work.id,
                             "title": work.title,
                             "city": work.city,
                             "salary": work.salary,
+                            "work_date": work.work_date,
                             "time_from": work.time_from,
                             "time_to": work.time_to,
+                            "category_ids": [item.id for item in work.categories] or [work.category_id],
+                            "feature_ids": [item.id for item in work.feature_items] or [work.features_id],
                         },
+                        "status": response_status,
                         "user": {
                             "id": user.id,
                             "first_name": user.first_name,

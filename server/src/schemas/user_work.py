@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date, time
 
 from models.models import Status
 from pydantic import BaseModel, ConfigDict, Field
@@ -32,22 +32,32 @@ class WorkResponse(BaseModel):
     title: str
     description: str
 
-    time_from: datetime
-    time_to: datetime
+    work_date: date
+    time_from: time
+    time_to: time
+    ends_next_day: bool
+    status: Status
+    company_name: str | None = None
+    company_id: int
 
     city: str | None
     salary: int | None
 
     features_id: int
     category_id: int
+    category_ids: list[int]
+    feature_ids: list[int]
 
 class WorkInfo(BaseModel):
+    category_ids: list[int]
+    feature_ids: list[int]
     id: int
     title: str
-    city: str
-    salary: int
-    time_from: datetime
-    time_to: datetime
+    city: str | None
+    salary: int | None
+    work_date: date
+    time_from: time
+    time_to: time
 
 class UserShortInfo(BaseModel):
     id: int
@@ -57,3 +67,4 @@ class UserShortInfo(BaseModel):
 class ResponseItem(BaseModel):
     work: WorkInfo
     user: UserShortInfo
+    status: Status

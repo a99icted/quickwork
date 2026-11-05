@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta, timezone
+from uuid import uuid4
 
 import jwt
 from core.config import settings
@@ -25,7 +26,8 @@ def create_access_token(user_id: int) -> str: # Создаёт JWT access token 
         "sub": str(user_id),
         "type": "access",
         "iat": now,
-        "exp": expires_at
+        "exp": expires_at,
+        "jti": uuid4().hex,
     }
 
     access_token = jwt.encode( # Подписываем payload секретным ключом и возвращаем готовую строку JWT.
@@ -39,7 +41,7 @@ def create_access_token(user_id: int) -> str: # Создаёт JWT access token 
 
 def get_user_id_from_access_token(token: str) -> int: # Проверяем токен на валидность
     try:
-        payload = jwt.decode(token, settings.JWT_SECRET_KEY, algorithms=[settings.JWT_ALGORITHM],) # Декодируем токен, чтобы получить зишифрованный в нем user_id и типа токена
+        payload = jwt.decode(token, settings.JWT_SECRET_KEY, algorithms=[settings.JWT_ALGORITHM], options={"require": ["sub", "iat", "exp", "type"]}) # Проверяем подпись и обязательные поля; JWT не шифруется.
 
     except ExpiredSignatureError:
         raise ValueError("Срок действия токена истек")

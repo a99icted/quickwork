@@ -8,6 +8,7 @@ from repositories.company import (
     delete_company,
     get_all_companies,
     get_company_by_id,
+    get_company_id_by_user_id,
     update_company,
 )
 from schemas.company import (
@@ -20,6 +21,14 @@ from schemas.company import (
 )
 
 router = APIRouter(prefix="/company", tags=["Company"])
+
+
+@router.get("/me", response_model=CompanyResponse | None)
+async def own_company(current_user: User = Depends(get_current_user)):
+    company_id = await get_company_id_by_user_id(current_user.id)
+    if company_id is None:
+        return None
+    return await get_company_by_id(company_id)
 
 
 

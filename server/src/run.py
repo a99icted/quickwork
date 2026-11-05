@@ -1,6 +1,6 @@
 import asyncio
 
-from repositories.core import init_db, recreate_db, add_category, add_feture  # noqa: F401
+from repositories.core import init_db, add_category, add_feture
 
 
 async def main():

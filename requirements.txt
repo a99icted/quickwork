@@ -20,3 +20,5 @@ typing_extensions==4.16.0
 uvicorn==0.53.0
 watchfiles==1.2.0
 websockets==17.1
+PyJWT==2.14.0
+pwdlib[argon2]==0.3.1
